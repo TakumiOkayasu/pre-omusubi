@@ -11,20 +11,24 @@ OBJ_DIR = obj
 TARGET = main
 
 # Source files
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+MAIN_SRC = main.cpp
+LIB_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+
+# Header files
+HEADERS = $(wildcard $(INC_DIR)/*.h)
 
 # Object files
-OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+LIB_OBJS = $(LIB_SRCS:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 # Default target
 all: $(TARGET)
 
-# Link object files to create executable
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJS)
+# Link main.cpp with library object files to create executable
+$(TARGET): $(MAIN_SRC) $(LIB_OBJS) $(HEADERS)
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(MAIN_SRC) $(LIB_OBJS)
 
-# Compile source files to object files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+# Compile library source files to object files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS) | $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Create obj directory if it doesn't exist
