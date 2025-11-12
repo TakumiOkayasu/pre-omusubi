@@ -41,26 +41,15 @@ public:
  *
  * 使用例:
  * @code
- * Measurable3D* accel = ctx.get_accelerometer();
+ * Measurable3D* accel = ctx.get_sensor()->get_accelerometer_context();
  *
  * if (accel) {
  *     // 3軸まとめて取得
  *     Vector3 acc = accel->get_values();
- *     serial->write("X: "_sv);
- *     serial->write(acc.x);
- *     serial->write(", Y: "_sv);
- *     serial->write(acc.y);
- *     serial->write(", Z: "_sv);
- *     serial->write_line(acc.z);
- *
- *     // 個別に取得
- *     float x = accel->get_x();
- *     float y = accel->get_y();
- *     float z = accel->get_z();
  * }
  * @endcode
  *
- * @note このインターフェースを実装するクラス: 加速度センサー、ジャイロスコープ
+ * @note このインターフェースを実装するクラス: AccelerometerContext, GyroscopeContext
  */
 class Measurable3D {
 public:
@@ -73,15 +62,6 @@ public:
 
     /** @brief X/Y/Z軸の値をまとめて取得 @return 3次元ベクトル */
     virtual Vector3 get_values() const = 0;
-
-    /** @brief X軸の値を取得 @return X軸の測定値 */
-    virtual float get_x() const = 0;
-
-    /** @brief Y軸の値を取得 @return Y軸の測定値 */
-    virtual float get_y() const = 0;
-
-    /** @brief Z軸の値を取得 @return Z軸の測定値 */
-    virtual float get_z() const = 0;
 };
 
 }  // namespace omusubi

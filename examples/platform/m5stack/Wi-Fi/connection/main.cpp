@@ -13,6 +13,7 @@ constexpr const char* WIFI_PASSWORD = "YourPassword";
 
 // グローバル変数：setup()で一度だけ取得し、loop()で再利用
 SystemContext& ctx = get_system_context();
+ConnectableContext* connectable = nullptr;
 SerialContext* serial = nullptr;
 WiFiContext* wifi = nullptr;
 
@@ -20,9 +21,12 @@ void setup() {
     // システムの初期化
     ctx.begin();
 
+    // Contextの取得（一度だけ）
+    connectable = ctx.get_connectable_context();
+
     // デバイスの取得（一度だけ）
-    serial = ctx.get_serial(0);
-    wifi = ctx.get_wifi();
+    serial = connectable->get_serial0_context();
+    wifi = connectable->get_wifi_context();
 
     // 接続開始
     serial->write_line("=== WiFi Connection ==="_sv);

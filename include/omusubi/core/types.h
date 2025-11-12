@@ -15,6 +15,14 @@ enum class PowerState : uint8_t {
 };
 
 /**
+ * @brief ボタン状態
+ */
+enum class ButtonState : uint8_t {
+    PRESSED,    ///< 押されている
+    RELEASED    ///< 離されている
+};
+
+/**
  * @brief 3次元ベクトル
  */
 struct Vector3 {

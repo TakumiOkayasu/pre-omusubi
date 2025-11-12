@@ -14,25 +14,16 @@ namespace omusubi {
  *
  * 使用例:
  * @code
- * SerialContext* serial = ctx.get_serial(0);
- *
- * // ボーレートを設定
- * serial->set_baud_rate(115200);
+ * SerialContext* serial = ctx.get_connectable_context()->get_serial0_context();
  *
  * // 接続
  * serial->connect();
  *
  * // データ送信
- * serial->write_line("Hello, Serial!"_sv);
- * serial->write(42);
+ * serial->write("Hello, Serial!"_sv);
  *
  * // データ受信
- * if (serial->has_data()) {
- *     FixedString<256> line = serial->read_line();
- * }
- *
- * // バッファをクリア
- * serial->clear();
+ * FixedBuffer<256> data = serial->read();
  * @endcode
  */
 class SerialContext
@@ -46,18 +37,6 @@ public:
     SerialContext& operator=(const SerialContext&) = delete;
     SerialContext(SerialContext&&) = delete;
     SerialContext& operator=(SerialContext&&) = delete;
-
-    /** @brief ボーレートを設定 @param baud_rate ボーレート（例: 9600, 115200） */
-    virtual void set_baud_rate(uint32_t baud_rate) = 0;
-
-    /** @brief 現在のボーレートを取得 @return ボーレート */
-    virtual uint32_t get_baud_rate() const = 0;
-
-    /** @brief 送信バッファをフラッシュ（送信完了まで待機） */
-    virtual void flush() = 0;
-
-    /** @brief 受信バッファをクリア */
-    virtual void clear() = 0;
 };
 
 }  // namespace omusubi

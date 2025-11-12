@@ -1,5 +1,7 @@
 #pragma once
 
+#include "omusubi/core/types.h"
+
 namespace omusubi {
 
 /**
@@ -9,21 +11,12 @@ namespace omusubi {
  *
  * 使用例:
  * @code
- * Pressable* button = ctx.get_button(0);
+ * Pressable* button = ctx.get_input()->get_button0_context();
  *
- * // ボタンが押された瞬間を検出
- * if (button->was_pressed()) {
- *     // ボタン押下時の処理
- * }
- *
- * // ボタンが押されている間を検出
- * if (button->is_pressed()) {
- *     // ボタンが押されている間の処理
- * }
- *
- * // ボタンが離された瞬間を検出
- * if (button->was_released()) {
- *     // ボタンリリース時の処理
+ * // ボタン状態を取得
+ * ButtonState state = button->get_state();
+ * if (state == ButtonState::PRESSED) {
+ *     // ボタンが押されている
  * }
  * @endcode
  *
@@ -38,14 +31,8 @@ public:
     Pressable(Pressable&&) = delete;
     Pressable& operator=(Pressable&&) = delete;
 
-    /** @brief 現在押されているか @return 押されていればtrue */
-    virtual bool is_pressed() const = 0;
-
-    /** @brief 前回のupdate以降に押されたか @return 押されたならtrue（1回だけtrueを返す） */
-    virtual bool was_pressed() = 0;
-
-    /** @brief 前回のupdate以降に離されたか @return 離されたならtrue（1回だけtrueを返す） */
-    virtual bool was_released() = 0;
+    /** @brief ボタン状態を取得 @return ボタンの現在の状態 */
+    virtual ButtonState get_state() const = 0;
 };
 
 }  // namespace omusubi

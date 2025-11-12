@@ -9,6 +9,8 @@ using namespace omusubi::literals;
 
 // グローバル変数：setup()で一度だけ取得し、loop()で再利用
 SystemContext& ctx = get_system_context();
+ConnectableContext* connectable = nullptr;
+InputContext* input = nullptr;
 SerialContext* serial = nullptr;
 BluetoothContext* bt = nullptr;
 Pressable* button_a = nullptr;
@@ -17,10 +19,14 @@ void setup() {
     // システムの初期化
     ctx.begin();
 
+    // Contextの取得（一度だけ）
+    connectable = ctx.get_connectable_context();
+    input = ctx.get_input_context();
+
     // デバイスの取得（一度だけ）
-    serial = ctx.get_serial(0);
-    bt = ctx.get_bluetooth();
-    button_a = ctx.get_button(0);
+    serial = connectable->get_serial0_context();
+    bt = connectable->get_bluetooth_context();
+    button_a = input->get_button_a_context();
 
     // 起動メッセージ
     serial->write_line("=== Bluetooth Scanner ==="_sv);

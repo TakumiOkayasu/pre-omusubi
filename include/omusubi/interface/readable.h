@@ -1,6 +1,5 @@
 #pragma once
 
-#include "omusubi/core/fixed_string.hpp"
 #include "omusubi/core/fixed_buffer.hpp"
 
 namespace omusubi {
@@ -12,22 +11,13 @@ namespace omusubi {
  *
  * 使用例:
  * @code
- * Readable* device = ctx.get_serial(0);
+ * Readable* device = ctx.get_connectable_context()->get_serial0_context();
  *
- * // データの有無を確認
- * if (device->has_data()) {
- *     // 1行読み取り
- *     FixedString<256> line = device->read_line();
- *
- *     // バイナリデータ読み取り
- *     FixedBuffer<256> data = device->read_bytes();
- * }
- *
- * // データが来るまで待機
- * FixedString<256> text = device->read_string_wait();
+ * // データを読み取る
+ * FixedBuffer<256> data = device->read();
  * @endcode
  *
- * @note このインターフェースを実装するクラス: SerialCommunication, BluetoothCommunication
+ * @note このインターフェースを実装するクラス: SerialContext, BluetoothContext
  */
 class Readable {
 public:
@@ -38,23 +28,8 @@ public:
     Readable(Readable&&) = delete;
     Readable& operator=(Readable&&) = delete;
 
-    /** @brief バッファ内の文字列を読み取る（非ブロッキング） */
-    virtual FixedString<256> read_string() = 0;
-
-    /** @brief 改行まで読み取る（非ブロッキング） */
-    virtual FixedString<256> read_line() = 0;
-
-    /** @brief データが来るまで待機して文字列を読み取る（ブロッキング） */
-    virtual FixedString<256> read_string_wait() = 0;
-
-    /** @brief データが来るまで待機して1行読み取る（ブロッキング） */
-    virtual FixedString<256> read_line_wait() = 0;
-
-    /** @brief バイナリデータを読み取る */
-    virtual FixedBuffer<256> read_bytes() = 0;
-
-    /** @brief 読み取り可能なデータがあるか確認 */
-    virtual bool has_data() const = 0;
+    /** @brief データを読み取る @return 読み取ったデータ */
+    virtual FixedBuffer<256> read() = 0;
 };
 
 }  // namespace omusubi

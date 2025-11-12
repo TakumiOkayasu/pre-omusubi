@@ -1,59 +1,75 @@
 #pragma once
 
 #include "omusubi/system_context.h"
+#include "m5stack_connectable_context.hpp"
+#include "m5stack_readable_context.hpp"
+#include "m5stack_writable_context.hpp"
+#include "m5stack_scannable_context.hpp"
+#include "m5stack_sensor_context.hpp"
+#include "m5stack_input_context.hpp"
+#include "m5stack_output_context.hpp"
+#include "m5stack_system_info_context.hpp"
+#include "m5stack_power_context.hpp"
 
 namespace omusubi {
 namespace platform {
 namespace m5stack {
 
+/**
+ * @brief M5Stack用システムコンテキスト
+ *
+ * Pattern A: デバイスの所有構造
+ * - ConnectableContextがSerial, Bluetooth, WiFi, BLEの実体を所有
+ * - 他のContextはデバイスへの参照を保持
+ */
 class M5StackSystemContext : public SystemContext {
 private:
-    class Impl;
+    // デバイスを所有するContext（先に初期化）
+    M5StackConnectableContext connectable_;
 
-    // ヒープを使わずに静的バッファで確保（placement newを使用）
-    static constexpr size_t ImplBufferSize = 8192;  // Implのサイズに十分な容量
-    alignas(std::max_align_t) char impl_buffer_[ImplBufferSize];
+    // デバイスへの参照を持つContext（後に初期化）
+    M5StackReadableContext readable_;
+    M5StackWritableContext writable_;
+    M5StackScannableContext scannable_;
 
-    Impl* get_impl() { return reinterpret_cast<Impl*>(impl_buffer_); }
-    const Impl* get_impl() const { return reinterpret_cast<const Impl*>(impl_buffer_); }
-
-    M5StackSystemContext();
-    ~M5StackSystemContext() override;
+    // 独立したContext
+    M5StackSensorContext sensor_;
+    M5StackInputContext input_;
+    M5StackOutputContext output_;
+    M5StackSystemInfoContext system_info_;
+    M5StackPowerContext power_;
 
 public:
-    // Singleton pattern
-    static M5StackSystemContext& get_instance();
+    // コンストラクタ（get_system_context()内でのみ使用される）
+    M5StackSystemContext();
+    ~M5StackSystemContext() override = default;
 
-    // Disable copy and assignment
+    // コピー・ムーブ禁止
     M5StackSystemContext(const M5StackSystemContext&) = delete;
     M5StackSystemContext& operator=(const M5StackSystemContext&) = delete;
 
-    // SystemContext interface implementation
-    const char* get_device_name() const override;
-    const char* get_firmware_version() const override;
-    FixedString<32> get_chip_id() const override;
-    uint32_t get_uptime_ms() const override;
-    uint32_t get_free_memory() const override;
-    PowerState get_power_state() const override;
-    uint8_t get_battery_level() const override;
-
-    SerialContext* get_serial(uint8_t port = 0) override;
-    BluetoothContext* get_bluetooth() override;
-    WiFiContext* get_wifi() override;
-    BLEContext* get_ble() override;
-
-    Pressable* get_button(uint8_t index) override;
-    uint8_t get_button_count() const override;
-
-    Measurable3D* get_accelerometer() override;
-    Measurable3D* get_gyroscope() override;
-
-    Displayable* get_display() override;
+    // ========================================
+    // システム制御
+    // ========================================
 
     void begin() override;
     void update() override;
     void delay(uint32_t ms) override;
     void reset() override;
+
+    // ========================================
+    // カテゴリ別コンテキストアクセス
+    // ========================================
+
+    ConnectableContext* get_connectable_context() override { return &connectable_; }
+    ReadableContext* get_readable_context() override { return &readable_; }
+    WritableContext* get_writable_context() override { return &writable_; }
+    ScannableContext* get_scannable_context() override { return &scannable_; }
+    SensorContext* get_sensor_context() override { return &sensor_; }
+    InputContext* get_input_context() override { return &input_; }
+    OutputContext* get_output_context() override { return &output_; }
+    SystemInfoContext* get_system_info_context() override { return &system_info_; }
+    PowerContext* get_power_context() override { return &power_; }
 };
 
 }  // namespace m5stack
