@@ -348,6 +348,79 @@ namespace omusubi {
 - `XXXSystemContext::get_instance()` is an internal implementation detail
 - User code remains unchanged when switching platforms
 
+**Platform-specific implementation hiding pattern:**
+
+To hide platform-specific types completely from headers:
+
+```cpp
+// ❌ Bad: Header exposes implementation details
+class M5StackBluetoothContext : public BluetoothContext {
+private:
+    void* impl_;  // Still exposes pointer
+    struct Impl;  // Still exposes type name
+};
+
+// ✅ Good: Header has NO implementation details
+class M5StackBluetoothContext : public BluetoothContext {
+public:
+    M5StackBluetoothContext();
+    ~M5StackBluetoothContext() override;
+    // Methods only
+};
+```
+
+```cpp
+// Implementation file (.cpp) - Platform-specific details hidden
+namespace {
+// Anonymous namespace - not visible outside this file
+struct BluetoothImpl {
+    BluetoothSerial bt;  // Platform-specific type
+    bool connected;
+    // ... implementation details
+};
+
+// Static variable - single instance
+BluetoothImpl impl;
+}  // namespace
+
+void M5StackBluetoothContext::write(StringView text) {
+    impl.bt.write(/*...*/);  // Direct access to static variable
+}
+```
+
+**Benefits:**
+- Headers contain zero platform-specific types
+- No `void*` pointers or forward declarations needed
+- Simple direct access to static variables
+- Perfect for singleton contexts (Bluetooth, WiFi, BLE, etc.)
+
+**For multi-instance contexts (Serial ports):**
+```cpp
+// Header: Minimal identification only
+class M5StackSerialContext : public SerialContext {
+private:
+    uint8_t port_;  // Identification only
+public:
+    explicit M5StackSerialContext(uint8_t port);
+};
+
+// Implementation: Static array of instances
+namespace {
+struct SerialImpl { /*...*/ };
+SerialImpl impl_port0(0);
+SerialImpl impl_port1(1);
+SerialImpl impl_port2(2);
+
+SerialImpl& get_impl(uint8_t port) {
+    switch (port) {
+        case 1: return impl_port1;
+        case 2: return impl_port2;
+        default: return impl_port0;
+    }
+}
+}  // namespace
+```
+
 ### Critical Design Rules
 
 **1. No Heap Allocation**
@@ -506,6 +579,7 @@ public:
 - **String literals:** Use `_sv` suffix (requires `using namespace omusubi::literals`)
 - **Header guards:** Use `#pragma once`
 - **Memory:** No heap allocation - stack or placement new with static buffers only
+- **Implementation Hiding:** When hiding platform-specific implementation details, do NOT expose implementation in headers (no `void* impl_`, no `struct Impl;` forward declarations). Place all implementation details in `.cpp` files using anonymous namespaces with static variables
 - **Comments:** Do not write unnecessary comments. Only add comments when they provide essential information that cannot be inferred from the code itself. Implementation details should be self-evident from the code structure
 
 ## Core Types
