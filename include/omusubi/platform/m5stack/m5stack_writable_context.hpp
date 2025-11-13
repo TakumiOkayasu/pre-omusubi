@@ -1,10 +1,12 @@
 #pragma once
 
 #include "omusubi/context/writable_context.h"
-#include "m5stack_serial_context.hpp"
-#include "m5stack_bluetooth_context.hpp"
 
 namespace omusubi {
+
+// 前方宣言
+class SerialContext;
+class BluetoothContext;
 namespace platform {
 namespace m5stack {
 
@@ -13,17 +15,17 @@ namespace m5stack {
  */
 class M5StackWritableContext : public WritableContext {
 private:
-    M5StackSerialContext* serial0_;
-    M5StackSerialContext* serial1_;
-    M5StackSerialContext* serial2_;
-    M5StackBluetoothContext* bluetooth_;
+    SerialContext* serial0_;
+    SerialContext* serial1_;
+    SerialContext* serial2_;
+    BluetoothContext* bluetooth_;
 
 public:
     M5StackWritableContext(
-        M5StackSerialContext* serial0,
-        M5StackSerialContext* serial1,
-        M5StackSerialContext* serial2,
-        M5StackBluetoothContext* bluetooth)
+        SerialContext* serial0,
+        SerialContext* serial1,
+        SerialContext* serial2,
+        BluetoothContext* bluetooth)
         : serial0_(serial0)
         , serial1_(serial1)
         , serial2_(serial2)

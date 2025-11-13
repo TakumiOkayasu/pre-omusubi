@@ -1,11 +1,13 @@
 #pragma once
 
 #include "omusubi/context/scannable_context.h"
-#include "m5stack_bluetooth_context.hpp"
-#include "m5stack_wifi_context.hpp"
-#include "m5stack_ble_context.hpp"
 
 namespace omusubi {
+
+// 前方宣言
+class BluetoothContext;
+class WiFiContext;
+class BLEContext;
 namespace platform {
 namespace m5stack {
 
@@ -14,15 +16,15 @@ namespace m5stack {
  */
 class M5StackScannableContext : public ScannableContext {
 private:
-    M5StackBluetoothContext* bluetooth_;
-    M5StackWiFiContext* wifi_;
-    M5StackBLEContext* ble_;
+    BluetoothContext* bluetooth_;
+    WiFiContext* wifi_;
+    BLEContext* ble_;
 
 public:
     M5StackScannableContext(
-        M5StackBluetoothContext* bluetooth,
-        M5StackWiFiContext* wifi,
-        M5StackBLEContext* ble)
+        BluetoothContext* bluetooth,
+        WiFiContext* wifi,
+        BLEContext* ble)
         : bluetooth_(bluetooth)
         , wifi_(wifi)
         , ble_(ble) {}

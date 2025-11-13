@@ -6,9 +6,6 @@ namespace omusubi {
 namespace platform {
 namespace m5stack {
 
-// 前方宣言
-class HardwareSerial;
-
 /**
  * @brief M5Stack用シリアル通信実装
  *
@@ -16,10 +13,7 @@ class HardwareSerial;
  */
 class M5StackSerialContext : public SerialContext {
 private:
-    HardwareSerial* serial_;
-    uint8_t port_;
-    uint32_t baud_rate_;
-    bool connected_;
+    uint8_t port_;  // ポート識別のみ保持
 
 public:
     explicit M5StackSerialContext(uint8_t port);
