@@ -1,9 +1,5 @@
 FROM mcr.microsoft.com/devcontainers/cpp:ubuntu-24.04
 
-ARG USER_NAME
-ARG USER_UID
-ARG USER_GID
-
 ENV TZ=Asia/Tokyo \
     LANG=ja_JP.UTF-8 \
     LANGUAGE=ja_JP:jp \
@@ -29,16 +25,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && locale-gen ja_JP.UTF-8 \
     && localedef -f UTF-8 -i ja_JP ja_JP.UTF-8
 
-WORKDIR /tmp/scripts/
+# terminal config - Git補完機能とカスタムプロンプトを追加
+RUN curl -o /usr/share/bash-completion/completions/git-completion.bash \
+        https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash \
+    && curl -o /usr/share/bash-completion/completions/git-prompt.sh \
+        https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh \
+    && chmod 755 /usr/share/bash-completion/completions/git-*.bash \
+    && chmod 755 /usr/share/bash-completion/completions/git-*.sh \
+    # .bashrcに追記（上書きしない）
+    && cat >> /home/vscode/.bashrc <<'EOF'
 
-# terminal config
-RUN curl -o ./create_user.sh https://raw.githubusercontent.com/TakumiOkayasu/shellscript_utility/refs/heads/main/create_user.sh \
-    && curl -o ./terminal_config.sh https://raw.githubusercontent.com/TakumiOkayasu/shellscript_utility/refs/heads/main/terminal_config.sh \
-    && chmod 777 ./*.sh \
-    && ./create_user.sh \
-    && ./terminal_config.sh \
-    && rm *.sh
+# Git補完機能とカスタムプロンプト
+if [ -f /usr/share/bash-completion/completions/git-completion.bash ]; then
+    source /usr/share/bash-completion/completions/git-completion.bash
+fi
+if [ -f /usr/share/bash-completion/completions/git-prompt.sh ]; then
+    source /usr/share/bash-completion/completions/git-prompt.sh
+    GIT_PS1_SHOWDIRTYSTATE=true
+    GIT_PS1_SHOWUNTRACKEDFILES=true
+    GIT_PS1_SHOWUPSTREAM=auto
+fi
+EOF
 
 WORKDIR /workspace
-USER ${USER_NAME}
 SHELL ["/bin/bash", "-c"]

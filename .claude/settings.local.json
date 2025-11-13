@@ -12,7 +12,11 @@
       "Bash(\"$file\")",
       "Bash(done)",
       "Bash(find:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(cat:*)",
+      "Bash(sudo ls:*)",
+      "Bash(sudo cat:*)"
     ],
     "deny": [],
     "ask": []
