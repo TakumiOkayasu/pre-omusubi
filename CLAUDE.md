@@ -659,72 +659,37 @@ SerialContext* serial_context(uint8_t port) const;
 SerialContext* get_serial(uint8_t port) const;
 ```
 
-**5. Method Proliferation Prohibition (CRITICAL)**
+**5. Same-Type Getter Prohibition (CRITICAL)**
 
-**禁止: Individual methods for each instance**
+Context classes MUST NOT contain multiple getter methods that return the same Context type. Use parameters or templates to distinguish instances.
+
 ```cpp
-// ❌ PROHIBITED - Violates DRY principle
-virtual SerialContext* get_serial0_context() const = 0;
-virtual SerialContext* get_serial1_context() const = 0;
-virtual SerialContext* get_serial2_context() const = 0;
-```
-
-**問題点:**
-- DRY (Don't Repeat Yourself) 原則違反
-- メソッドが無限に増える可能性
-- メンテナンス性の低下
-- スケーラビリティの欠如
-
-**必須: Parameter-based access**
-```cpp
-// ✅ REQUIRED - Scalable and maintainable
-virtual SerialContext* get_serial_context(uint8_t port) const = 0;
-virtual uint8_t get_serial_count() const = 0;  // Required for loops
-
-// ✅ OPTIONAL - Template version for compile-time
-template<uint8_t Port>
-SerialContext* get_serial_context() const {
-    static_assert(Port < 3, "Port out of range");
-    return get_serial_context(Port);
-}
-```
-
-**Multi-instance Device Requirements:**
-When implementing devices with multiple instances (serial ports, buttons, etc.):
-1. **Runtime parameter method** (必須)
-2. **Count getter method** (必須) - for iteration
-3. **Template parameter method** (推奨) - for compile-time optimization
-
-**Implementation Pattern (Array-based):**
-```cpp
-// ✅ RECOMMENDED - Array-based management
-class M5StackConnectableContext : public ConnectableContext {
-private:
-    mutable M5StackSerialContext serials_[3]{
-        M5StackSerialContext(0),
-        M5StackSerialContext(1),
-        M5StackSerialContext(2)
-    };
-
+// ❌ PROHIBITED - Same return type
+class SampleContext {
 public:
-    SerialContext* get_serial_context(uint8_t port) const override {
-        return (port < 3) ? &serials_[port] : nullptr;
+    virtual HogeContext* get_hoge_1_context() const = 0;
+    virtual HogeContext* get_hoge_2_context() const = 0;
+};
+
+// ✅ CORRECT - Parameter-based access
+class SampleContext {
+public:
+    virtual HogeContext* get_hoge_context(uint8_t index) const = 0;
+    virtual uint8_t get_hoge_count() const = 0;
+
+    // Optional: Template version for compile-time
+    template<uint8_t Index>
+    HogeContext* get_hoge_context() const {
+        return get_hoge_context(Index);
     }
-    uint8_t get_serial_count() const override { return 3; }
 };
 ```
 
-```cpp
-// ❌ NOT RECOMMENDED - Individual member variables
-class BadExample : public ConnectableContext {
-private:
-    M5StackSerialContext serial0_;
-    M5StackSerialContext serial1_;
-    M5StackSerialContext serial2_;
-
-    // Requires switch statement or individual methods - poor scalability
-};
-```
+**Rationale:**
+- DRY (Don't Repeat Yourself) principle
+- Scalability (no method explosion)
+- Type safety (compiler can validate parameter ranges)
+- Maintainability
 
 **6. SystemContext Access: Free Function Pattern**
 
