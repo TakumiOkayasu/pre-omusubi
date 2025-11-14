@@ -538,10 +538,49 @@ Issue や Pull Request を歓迎します！
 
 ## ドキュメント
 
-詳細なドキュメントは準備中です。
+### 開発者向けドキュメント
+
+- **[開発ガイド](DEVELOPMENT.md)** - 開発環境のセットアップとワークフロー
+- **[貢献ガイド](docs/contributing.md)** - プロジェクトへの貢献方法
+- **[アーキテクチャ](docs/architecture.md)** - 設計思想とアーキテクチャの詳細
+- **[APIリファレンス](docs/api-reference.md)** - 完全なAPIドキュメント
+- **[コード品質](docs/code-quality.md)** - フォーマットとLintツール
+- **[テストガイド](docs/testing.md)** - テスト戦略とガイドライン
+
+### プラットフォーム
+
+- **[プラットフォームサポート](docs/platform-support.md)** - 対応ハードウェアと実装状況
+- **[マイグレーションガイド](docs/migration-guide.md)** - バージョン間の移行方法
+
+### プロジェクト管理
+
+- **[CHANGELOG](CHANGELOG.md)** - バージョン履歴と変更内容
+- **[SECURITY](SECURITY.md)** - セキュリティポリシーと脆弱性報告
+
+## コミュニティ
+
+### 質問・議論
+
+- **[GitHub Discussions](https://github.com/your-org/omusubi/discussions)** - 質問、アイデア、一般的な議論
+
+### バグ報告・機能リクエスト
+
+- **[Bug Report](https://github.com/your-org/omusubi/issues/new?template=bug_report.md)** - バグを報告
+- **[Feature Request](https://github.com/your-org/omusubi/issues/new?template=feature_request.md)** - 新機能を提案
+- **[Platform Support](https://github.com/your-org/omusubi/issues/new?template=platform_support.md)** - プラットフォームサポートをリクエスト
+
+### 貢献する
+
+プルリクエストを歓迎します！貢献前に[Contributing Guide](docs/contributing.md)をご確認ください。
+
+## ライセンス
+
+未定（検討中）
 
 ## 作者
 
 Murata
 
-** 開発中のプロジェクトです **
+---
+
+**開発中のプロジェクトです。** APIは変更される可能性があります。

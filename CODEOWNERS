@@ -1,0 +1,55 @@
+# Code Owners
+#
+# このファイルは、プロジェクトの各部分の責任者を定義します。
+# プルリクエストが作成されると、該当するコードオーナーが自動的にレビュアーとして割り当てられます。
+#
+# 構文: <path> @github-username
+# 詳細: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# デフォルトオーナー（すべてのファイル）
+* @your-github-username
+
+# ドキュメント
+/docs/ @your-github-username
+/README.md @your-github-username
+/DEVELOPMENT.md @your-github-username
+/CHANGELOG.md @your-github-username
+/SECURITY.md @your-github-username
+
+# コア機能
+/include/omusubi/core/ @your-github-username
+/include/omusubi/interface/ @your-github-username
+/include/omusubi/context/ @your-github-username
+/include/omusubi/device/ @your-github-username
+
+# プラットフォーム実装
+/include/omusubi/platform/ @your-github-username
+/src/platform/ @your-github-username
+
+# M5Stack固有
+/include/omusubi/platform/m5stack/ @your-github-username
+/src/platform/m5stack/ @your-github-username
+
+# Arduino固有（今後追加）
+# /include/omusubi/platform/arduino/ @arduino-maintainer
+# /src/platform/arduino/ @arduino-maintainer
+
+# Raspberry Pi Pico固有（今後追加）
+# /include/omusubi/platform/pico/ @pico-maintainer
+# /src/platform/pico/ @pico-maintainer
+
+# ビルド設定
+/Makefile @your-github-username
+/.github/ @your-github-username
+/.devcontainer/ @your-github-username
+
+# コード品質ツール
+/.clang-format @your-github-username
+/.clang-tidy @your-github-username
+/scripts/ @your-github-username
+
+# サンプルコード
+/examples/ @your-github-username
+
+# テスト
+/tests/ @your-github-username
