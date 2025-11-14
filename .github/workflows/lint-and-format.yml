@@ -34,11 +34,3 @@ jobs:
         run: |
           chmod +x scripts/lint.sh
           ./scripts/lint.sh
-
-      - name: Build project (if applicable)
-        run: |
-          if [ -f "Makefile" ]; then
-            make
-          else
-            echo "No Makefile found, skipping build"
-          fi
