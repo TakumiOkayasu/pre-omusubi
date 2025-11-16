@@ -156,8 +156,8 @@ public:
      * @brief spanから構築
      */
     void from_span(span<const char> s) noexcept {
-        byte_length_ = (s.size() < Capacity) ? s.size() : Capacity;
-        for (size_t i = 0; i < byte_length_; ++i) {
+        byte_length_ = (s.size() < Capacity) ? static_cast<uint32_t>(s.size()) : Capacity;
+        for (uint32_t i = 0; i < byte_length_; ++i) {
             buffer_[i] = s[i];
         }
         buffer_[byte_length_] = '\0';

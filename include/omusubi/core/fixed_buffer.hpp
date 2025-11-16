@@ -85,8 +85,8 @@ public:
      * @brief spanから構築
      */
     void from_span(span<const uint8_t> s) noexcept {
-        length_ = (s.size() < Capacity) ? s.size() : Capacity;
-        for (size_t i = 0; i < length_; ++i) {
+        length_ = (s.size() < Capacity) ? static_cast<uint32_t>(s.size()) : Capacity;
+        for (uint32_t i = 0; i < length_; ++i) {
             buffer_[i] = s[i];
         }
     }

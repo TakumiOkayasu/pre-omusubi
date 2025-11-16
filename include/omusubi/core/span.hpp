@@ -91,17 +91,3 @@ constexpr span<const char> as_chars(span<const uint8_t> s) noexcept {
 }
 
 } // namespace omusubi
-
-#include "string_view.h"
-
-namespace omusubi {
-
-constexpr span<const char> to_span(StringView sv) noexcept {
-    return {sv.data(), sv.byte_length()};
-}
-
-constexpr StringView to_string_view(span<const char> s) noexcept {
-    return {s.data(), static_cast<uint32_t>(s.size())};
-}
-
-} // namespace omusubi

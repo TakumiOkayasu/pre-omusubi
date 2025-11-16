@@ -14,12 +14,12 @@ namespace omusubi {
  * - 実行時オーバーヘッドゼロ
  * - constexprコンテキストで使用可能
  */
-template <size_t N>
+template <uint32_t N>
 class StaticString : public String<StaticString<N>> {
 public:
-    constexpr size_t size() const noexcept { return N; }
+    constexpr uint32_t size() const noexcept { return N; }
 
-    constexpr uint32_t byte_length() const noexcept { return static_cast<uint32_t>(N); }
+    constexpr uint32_t byte_length() const noexcept { return N; }
 
     constexpr const char* data() const noexcept { return data_; }
 
@@ -27,17 +27,17 @@ public:
 
     constexpr const char* c_str() const noexcept { return data_; }
 
-    constexpr char operator[](size_t index) const noexcept { return data_[index]; }
+    constexpr char operator[](uint32_t index) const noexcept { return data_[index]; }
 
-    constexpr char& operator[](size_t index) noexcept { return data_[index]; }
+    constexpr char& operator[](uint32_t index) noexcept { return data_[index]; }
 
-    template <size_t Offset, size_t Length>
+    template <uint32_t Offset, uint32_t Length>
     constexpr StaticString<Length> substring() const noexcept {
         static_assert(Offset + Length <= N, "Substring out of range");
 
         StaticString<Length> result {};
 
-        for (size_t i = 0; i < Length; ++i) {
+        for (uint32_t i = 0; i < Length; ++i) {
             result[i] = data_[Offset + i];
         }
 
@@ -48,7 +48,7 @@ public:
 
     template <int Value>
     static constexpr auto from_int() noexcept {
-        constexpr size_t DIGITS = count_digits(Value);
+        constexpr uint32_t DIGITS = count_digits(Value);
         StaticString<DIGITS> result {};
 
         int val = Value;
@@ -58,7 +58,7 @@ public:
             val = -val;
         }
 
-        size_t pos = DIGITS;
+        uint32_t pos = DIGITS;
         result[pos] = '\0';
 
         if (val == 0) {
@@ -79,12 +79,12 @@ public:
     }
 
 private:
-    static constexpr size_t count_digits(int value) noexcept {
+    static constexpr uint32_t count_digits(int value) noexcept {
         if (value == 0) {
             return 1;
         }
 
-        size_t count = 0;
+        uint32_t count = 0;
 
         if (value < 0) {
             ++count;
@@ -105,11 +105,11 @@ private:
 /**
  * @brief 文字列リテラルからコンパイル時文字列を構築
  */
-template <size_t N>
+template <uint32_t N>
 constexpr StaticString<N - 1> static_string(const char (&str)[N]) noexcept {
     StaticString<N - 1> result {};
 
-    for (size_t i = 0; i < N - 1; ++i) {
+    for (uint32_t i = 0; i < N - 1; ++i) {
         result[i] = str[i];
     }
 
@@ -121,15 +121,15 @@ constexpr StaticString<N - 1> static_string(const char (&str)[N]) noexcept {
 /**
  * @brief 2つの文字列を連結（コンパイル時）
  */
-template <size_t N1, size_t N2>
+template <uint32_t N1, uint32_t N2>
 constexpr StaticString<N1 + N2> operator+(const StaticString<N1>& a, const StaticString<N2>& b) noexcept {
     StaticString<N1 + N2> result {};
 
-    for (size_t i = 0; i < N1; ++i) {
+    for (uint32_t i = 0; i < N1; ++i) {
         result[i] = a[i];
     }
 
-    for (size_t i = 0; i < N2; ++i) {
+    for (uint32_t i = 0; i < N2; ++i) {
         result[N1 + i] = b[i];
     }
 
@@ -138,28 +138,14 @@ constexpr StaticString<N1 + N2> operator+(const StaticString<N1>& a, const Stati
     return result;
 }
 
-template <size_t N1, size_t N2>
+template <uint32_t N1, uint32_t N2>
 constexpr bool operator==(const StaticString<N1>& a, const StaticString<N2>& b) noexcept {
     return a.equals(b);
 }
 
-template <size_t N1, size_t N2>
+template <uint32_t N1, uint32_t N2>
 constexpr bool operator!=(const StaticString<N1>& a, const StaticString<N2>& b) noexcept {
     return !a.equals(b);
-}
-
-/**
- * @brief static_string生成ヘルパー関数
- *
- * コンパイル時文字列を作成するためのヘルパー関数。
- *
- * @code
- * constexpr auto str = make_static_string("Hello");
- * @endcode
- */
-template <uint32_t N>
-constexpr static_string<N> make_static_string(const char (&str)[N]) noexcept {
-    return static_string<N>(str);
 }
 
 } // namespace omusubi
