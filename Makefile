@@ -1,6 +1,6 @@
 # Compiler and flags
 CXX = clang++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude
+CXXFLAGS = -std=c++14 -Wall -Wextra -Iinclude
 
 # Directories
 SRC_DIR = src

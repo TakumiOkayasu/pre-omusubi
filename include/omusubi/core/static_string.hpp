@@ -149,16 +149,17 @@ constexpr bool operator!=(const StaticString<N1>& a, const StaticString<N2>& b) 
 }
 
 /**
- * @brief ユーザー定義リテラル（簡潔な構文用）
+ * @brief static_string生成ヘルパー関数
+ *
+ * コンパイル時文字列を作成するためのヘルパー関数。
+ *
+ * @code
+ * constexpr auto str = make_static_string("Hello");
+ * @endcode
  */
-namespace literals {
-
-template <typename T, T... Chars>
-constexpr auto operator""_ss() noexcept {
-    constexpr char str[] = {Chars..., '\0'};
-    return static_string(str);
+template <uint32_t N>
+constexpr static_string<N> make_static_string(const char (&str)[N]) noexcept {
+    return static_string<N>(str);
 }
-
-} // namespace literals
 
 } // namespace omusubi

@@ -34,7 +34,7 @@ constexpr std::size_t MAX_BUFFER_SIZE = 1024;
 /**
  * @brief デバッグモードが有効かどうか
  */
-inline constexpr bool is_debug_build() {
+constexpr bool is_debug_build() {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
     return true;
 #else
@@ -49,7 +49,7 @@ inline constexpr bool is_debug_build() {
 /**
  * @brief ESP32/ESP8266プラットフォームかどうか
  */
-inline constexpr bool is_platform_esp() {
+constexpr bool is_platform_esp() {
 #if defined(ESP32) || defined(ESP8266)
     return true;
 #else
@@ -60,7 +60,7 @@ inline constexpr bool is_platform_esp() {
 /**
  * @brief Arduinoプラットフォームかどうか
  */
-inline constexpr bool is_platform_arduino() {
+constexpr bool is_platform_arduino() {
 #if defined(ARDUINO)
     return true;
 #else
@@ -71,7 +71,7 @@ inline constexpr bool is_platform_arduino() {
 /**
  * @brief 汎用プラットフォームかどうか
  */
-inline constexpr bool is_platform_generic() {
+constexpr bool is_platform_generic() {
     return !is_platform_esp() && !is_platform_arduino();
 }
 
