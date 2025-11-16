@@ -865,6 +865,31 @@ public:
   - Binary literals (`0b1010`) and digit separators (`1'000'000`)
   - `std::make_unique` for rare heap allocations (though heap allocation is generally prohibited)
   - Variable templates
+- **constexpr Usage (CRITICAL RULE):**
+  - **ALWAYS use `constexpr` whenever possible** - This is a strict requirement
+  - Apply `constexpr` to all functions, constructors, and methods that can be evaluated at compile time
+  - Benefits:
+    - Compile-time computation reduces runtime overhead
+    - Smaller binary size
+    - Type safety improvements
+    - Enables use in constant expressions and `static_assert`
+  - Examples:
+    ```cpp
+    // ✅ All possible functions are constexpr
+    constexpr uint32_t byte_length() const noexcept { return byte_length_; }
+    constexpr bool append(StringView view) noexcept { /* ... */ }
+    constexpr StringView view() const noexcept { return StringView(buffer_, byte_length_); }
+
+    // ✅ Constructors
+    constexpr FixedString() noexcept : byte_length_(0) { buffer_[0] = '\0'; }
+
+    // ✅ Free functions
+    constexpr FixedString<N - 1> fixed_string(const char (&str)[N]) noexcept { /* ... */ }
+    ```
+  - Only omit `constexpr` when:
+    - Function has side effects (I/O, hardware access, etc.)
+    - Function cannot be evaluated at compile time due to technical limitations
+    - Provide clear justification in comments if `constexpr` is not used
 - **Type Deduction with `auto`:**
   - **Prefer `auto` for variable declarations** unless there is a specific reason to use explicit types
   - `auto` improves maintainability and reduces coupling to specific types
