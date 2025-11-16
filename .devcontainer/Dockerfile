@@ -14,6 +14,8 @@ ENV TZ=Asia/Tokyo \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # フォーマッタ
     clang-format \
+    # Linter
+    clang-tidy \
     # 日本語ロケールとタイムゾーン設定用
     locales \
     tzdata \
