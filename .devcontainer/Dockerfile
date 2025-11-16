@@ -12,6 +12,8 @@ ENV TZ=Asia/Tokyo \
     DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    # フォーマッタ
+    clang-format \
     # 日本語ロケールとタイムゾーン設定用
     locales \
     tzdata \
