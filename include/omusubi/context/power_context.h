@@ -2,6 +2,8 @@
 
 #include "omusubi/core/types.h"
 
+#include <cstdint>
+
 namespace omusubi {
 
 /**

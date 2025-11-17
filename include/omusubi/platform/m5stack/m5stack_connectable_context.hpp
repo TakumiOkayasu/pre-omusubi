@@ -2,6 +2,8 @@
 
 #include "omusubi/context/connectable_context.h"
 
+#include <cstdint>
+
 #include "m5stack_ble_context.hpp"
 #include "m5stack_bluetooth_context.hpp"
 #include "m5stack_serial_context.hpp"

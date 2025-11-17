@@ -2,6 +2,8 @@
 
 #include "omusubi/device/ble_context.h"
 
+#include <cstdint>
+
 namespace omusubi {
 namespace platform {
 namespace m5stack {

@@ -3,6 +3,8 @@
 #include "omusubi/interface/connectable.h"
 #include "omusubi/interface/scannable.h"
 
+#include <cstdint>
+
 namespace omusubi {
 
 /**
