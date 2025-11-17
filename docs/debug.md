@@ -97,54 +97,105 @@ void loop() {
 }
 ```
 
-### 2. ログレベル
+### 2. Loggerクラスの使用
 
-**ログの重要度を分類。**
+**組み込み向け軽量Loggerを使用。**
+
+Omusubiは `Logger` クラスを提供しています。ヒープ不使用、例外不使用で動作します。
 
 ```cpp
-enum class LogLevel : uint8_t {
-    DEBUG,    // デバッグ情報
-    INFO,     // 通常情報
-    WARNING,  // 警告
-    ERROR     // エラー
-};
+#include <omusubi/omusubi.h>
 
-void log(LogLevel level, StringView message) {
-    const char* prefix = "";
-    switch (level) {
-        case LogLevel::DEBUG:   prefix = "[DEBUG] "; break;
-        case LogLevel::INFO:    prefix = "[INFO] ";  break;
-        case LogLevel::WARNING: prefix = "[WARN] ";  break;
-        case LogLevel::ERROR:   prefix = "[ERROR] "; break;
-    }
+using namespace omusubi;
 
-    serial->write(prefix);
-    serial->write(message);
-    serial->write("\n"_sv);
+// グローバル変数
+SystemContext& ctx = get_system_context();
+SerialContext* serial = nullptr;
+SerialLogOutput* log_output = nullptr;
+Logger* logger = nullptr;
+
+void setup() {
+    ctx.begin();
+    serial = ctx.get_connectable_context()->get_serial_context(0);
+
+    // Logger初期化（スタック変数として保持）
+    static SerialLogOutput log_out(serial);
+    static Logger log(&log_out, LogLevel::INFO);
+    log_output = &log_out;
+    logger = &log;
+
+    // ログ出力
+    logger->info(StringView("System started", 14));
+    logger->debug(StringView("Debug info", 10));  // min_level=INFOなので出力されない
 }
 
-// 使用例
-log(LogLevel::DEBUG, "setup() started"_sv);
-log(LogLevel::ERROR, "Connection failed"_sv);
+void loop() {
+    ctx.update();
+
+    // 各ログレベルでの出力
+    logger->debug(StringView("Debug message", 13));
+    logger->info(StringView("Info message", 12));
+    logger->warning(StringView("Warning message", 15));
+    logger->error(StringView("Error message", 13));
+    logger->critical(StringView("Critical message", 16));
+
+    ctx.delay(1000);
+}
 ```
 
-### 3. 条件付きログ
+**ログレベル:**
+- `DEBUG` - デバッグ情報（開発時のみ）
+- `INFO` - 一般情報
+- `WARNING` - 警告（エラーではないが注意が必要）
+- `ERROR` - エラー（機能の一部が失敗）
+- `CRITICAL` - 致命的エラー（システムが継続不能）
+
+**最小ログレベルの設定:**
+```cpp
+// デバッグビルド: DEBUGレベルから出力
+logger->set_min_level(LogLevel::DEBUG);
+
+// リリースビルド: WARNINGレベル以上のみ
+logger->set_min_level(LogLevel::WARNING);
+```
+
+### 3. コンパイル時ログフィルタリング（マクロなし）
 
 **デバッグビルドのみログ出力。**
 
-```cpp
-#ifdef DEBUG
-    #define DEBUG_LOG(msg) serial->write("[DEBUG] " msg "\n"_sv)
-#else
-    #define DEBUG_LOG(msg) ((void)0)  // リリースビルドでは削除
-#endif
+Loggerクラスには、テンプレート特殊化によりコンパイル時にDEBUGログを削除する機能があります。
+マクロを使用しない、型安全な実装です。
 
+```cpp
+// テンプレート関数 log_at<Level> を使用
 void process() {
-    DEBUG_LOG("process() called");  // デバッグビルドのみ出力
+    // リリースビルド（NDEBUG定義時）ではDEBUGログが完全に削除される
+    log_at<LogLevel::DEBUG>(*logger, StringView("process() called", 16));
+    log_at<LogLevel::INFO>(*logger, StringView("Processing data", 15));
 
     // 処理本体
 }
+
+// 通常のメソッド呼び出しも可能（実行時フィルタリング）
+logger->debug(StringView("Debug", 5));
+logger->info(StringView("Info", 4));
 ```
+
+**実装の仕組み:**
+```cpp
+// テンプレート特殊化によりDEBUGログを削除
+template <>
+struct LogDispatcher<LogLevel::DEBUG, false> {  // false = リリースビルド
+    static void dispatch(const Logger&, StringView) {
+        // 空実装 - コンパイラの最適化により完全に削除される
+    }
+};
+```
+
+**リリースビルドでの動作:**
+- `log_at<LogLevel::DEBUG>()` は完全にコードから削除される（バイナリサイズ削減）
+- `log_at<LogLevel::INFO>()` 以上は実行時にmin_levelで制御
+- マクロ不使用により、型安全でデバッグしやすい
 
 ### 4. 関数トレース
 
@@ -643,5 +694,5 @@ void loop() {
 
 ---
 
-**Version:** 1.0.0
+**Version:** 1.2.0
 **Last Updated:** 2025-11-17
