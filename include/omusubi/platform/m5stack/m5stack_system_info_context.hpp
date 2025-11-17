@@ -14,8 +14,8 @@ public:
     M5StackSystemInfoContext() = default;
     ~M5StackSystemInfoContext() override = default;
 
-    FixedString<64> get_device_name() const override;
-    FixedString<32> get_firmware_version() const override;
+    StringView get_device_name() const override;
+    StringView get_firmware_version() const override;
     uint64_t get_chip_id() const override;
     uint32_t get_uptime_ms() const override;
     uint32_t get_free_memory() const override;

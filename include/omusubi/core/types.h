@@ -8,10 +8,10 @@ namespace omusubi {
  * @brief 電源状態
  */
 enum class PowerState : uint8_t {
-    battery,  ///< バッテリー駆動
-    usb,      ///< USB給電
-    external, ///< 外部電源
-    unknown   ///< 不明
+    BATTERY,  ///< バッテリー駆動
+    USB,      ///< USB給電
+    EXTERNAL, ///< 外部電源
+    UNKNOWN   ///< 不明
 };
 
 /**

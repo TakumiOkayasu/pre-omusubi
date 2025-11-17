@@ -25,7 +25,7 @@ public:
     void start_scan() override;
     void stop_scan() override;
     uint8_t get_found_count() const override;
-    FixedString<64> get_found_name(uint8_t index) const override;
+    StringView get_found_name(uint8_t index) const override;
     int32_t get_found_signal_strength(uint8_t index) const override;
 };
 
