@@ -45,6 +45,11 @@ Temporary Items
 ### AI ###
 .claude/
 
+### clangd ###
+.cache/
+*.idx
+compile_commands.json
+
 ### Linux ###
 *~
 
