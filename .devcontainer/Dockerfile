@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     clang-format \
     # Linter
     clang-tidy \
+    # Language Server (clangd)
+    clangd \
     # 日本語ロケールとタイムゾーン設定用
     locales \
     tzdata \
