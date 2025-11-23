@@ -171,8 +171,10 @@ ALL getter methods MUST be `const`. If not possible, provide clear justification
 
 **C++17 Standard (Strict)**
 - All C++14 features plus: nested namespaces (`namespace A::B {}`), `if constexpr`, structured bindings, inline variables, fold expressions
+- **Modern C++ First:** Actively use latest C++17 features to write simple, concise code
 - **constexpr Rule:** ALWAYS use `constexpr` when possible - apply to functions, constructors, methods
 - Only omit when function has side effects or technical limitations - provide justification
+- **Prefer `if constexpr` over template specialization** when appropriate for better readability
 
 **Type Deduction**
 - **Prefer `auto`** for function returns

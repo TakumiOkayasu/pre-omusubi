@@ -1,6 +1,6 @@
 ---
 # Omusubi C++ Linting Configuration
-# Optimized for embedded C++14 development
+# Optimized for embedded C++17 development
 
 Checks: >
   -*,
