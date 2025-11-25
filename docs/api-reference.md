@@ -277,6 +277,116 @@ enum class ButtonState : uint8_t {
 };
 ```
 
+### format()
+
+型安全な文字列フォーマット関数。
+
+```cpp
+#include <omusubi/core/format.hpp>
+
+// 基本シグネチャ
+template <std::size_t N, typename... Args>
+constexpr auto format(const char (&fmt)[N], Args&&... args);
+
+// 明示的容量指定
+template <std::size_t Capacity, std::size_t N, typename... Args>
+constexpr FixedString<Capacity> format_to(const char (&fmt)[N], Args&&... args);
+```
+
+**サポートされるフォーマット指定子:**
+
+| 指定子 | 説明 | 対応型 |
+|--------|------|--------|
+| `{}` | デフォルト形式 | 全ての型 |
+| `{:d}` | 10進整数 | int, uint, etc. |
+| `{:x}` | 16進整数（小文字） | int, uint, etc. |
+| `{:X}` | 16進整数（大文字） | int, uint, etc. |
+| `{:b}` | 2進整数 | int, uint, etc. |
+| `{:f}` | 浮動小数点 | float, double |
+| `{:s}` | 文字列 | StringView, const char* |
+
+**使用例:**
+
+```cpp
+using namespace omusubi;
+
+// 基本的な使用
+auto msg = format("Hello, {}!", "World");
+// → "Hello, World!"
+
+// 複数の引数
+auto log = format("[{}] {}: {}", "INFO", "main", "started");
+// → "[INFO] main: started"
+
+// 数値フォーマット
+auto hex = format("Value: 0x{:X}", 255);
+// → "Value: 0xFF"
+
+// 浮動小数点
+auto temp = format("Temperature: {:f}C", 25.5F);
+// → "Temperature: 25.500000C"
+
+// 明示的容量指定
+auto fixed = format_to<128>("Large message: {}", long_string);
+```
+
+**特徴:**
+- コンパイル時フォーマット文字列検証
+- ヒープアロケーションなし
+- 容量自動推定
+- 組み込み環境に最適化
+
+### Result<T, E>
+
+Rust風のエラーハンドリング型。
+
+```cpp
+#include <omusubi/core/result.hpp>
+
+template <typename T, typename E = Error>
+class Result {
+public:
+    // ファクトリメソッド
+    static constexpr Result ok(const T& value) noexcept;
+    static constexpr Result err(const E& error) noexcept;
+
+    // 状態チェック
+    [[nodiscard]] constexpr bool is_ok() const noexcept;
+    [[nodiscard]] constexpr bool is_err() const noexcept;
+
+    // 値取得
+    [[nodiscard]] constexpr T& value();
+    [[nodiscard]] constexpr const T& value() const;
+    [[nodiscard]] constexpr T value_or(const T& default_value) const;
+
+    // エラー取得
+    [[nodiscard]] constexpr E& error();
+    [[nodiscard]] constexpr const E& error() const;
+};
+```
+
+**使用例:**
+
+```cpp
+Result<uint32_t, Error> read_sensor() {
+    if (!sensor_ready()) {
+        return Result<uint32_t, Error>::err(Error::NOT_CONNECTED);
+    }
+    return Result<uint32_t, Error>::ok(read_value());
+}
+
+// 使用
+auto result = read_sensor();
+if (result.is_ok()) {
+    process(result.value());
+} else {
+    handle_error(result.error());
+}
+
+// デフォルト値付き
+uint32_t value = read_sensor().value_or(0);
+```
+
 ## Interfaces
 
 ### ByteReadable
@@ -856,5 +966,5 @@ constexpr size_t len = msg.size();
 
 ---
 
-**Version:** 2.0.0
-**Last Updated:** 2025-11-16
+**Version:** 2.1.0
+**Last Updated:** 2025-11-25

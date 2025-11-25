@@ -475,13 +475,13 @@ for (auto& dev : devices) {
 
 ```makefile
 # デバッグビルド
-CXXFLAGS_DEBUG = -std=c++14 -g -O0
+CXXFLAGS_DEBUG = -std=c++17 -g -O0
 
 # リリースビルド (速度優先)
-CXXFLAGS_RELEASE = -std=c++14 -O2 -DNDEBUG
+CXXFLAGS_RELEASE = -std=c++17 -O2 -DNDEBUG
 
 # リリースビルド (サイズ優先、組み込みシステム推奨)
-CXXFLAGS_RELEASE_SIZE = -std=c++14 -Os -DNDEBUG
+CXXFLAGS_RELEASE_SIZE = -std=c++17 -Os -DNDEBUG
 ```
 
 **最適化レベルの選択:**
@@ -497,7 +497,7 @@ CXXFLAGS_RELEASE_SIZE = -std=c++14 -Os -DNDEBUG
 
 ```makefile
 # LTO有効化
-CXXFLAGS_RELEASE = -std=c++14 -O2 -flto -DNDEBUG
+CXXFLAGS_RELEASE = -std=c++17 -O2 -flto -DNDEBUG
 LDFLAGS_RELEASE = -flto
 ```
 
@@ -597,7 +597,7 @@ void check_heap() {
 
 ```bash
 # gprof によるプロファイリング
-clang++ -std=c++14 -pg -O2 main.cpp -o main
+clang++ -std=c++17 -pg -O2 main.cpp -o main
 ./main
 gprof main gmon.out > profile.txt
 
@@ -714,11 +714,11 @@ public:
 
 ## 関連ドキュメント
 
-- CLAUDE.md - ゼロオーバーヘッド抽象化の設計原則
+- [CLAUDE.md](../CLAUDE.md) - ゼロオーバーヘッド抽象化の設計原則
 - [テストガイド](testing.md) - パフォーマンステストの書き方
 - [ビルドシステムガイド](build-system.md) - 最適化オプションの設定
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-17
+**Version:** 1.1.0
+**Last Updated:** 2025-11-25

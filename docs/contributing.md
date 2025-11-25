@@ -82,13 +82,17 @@ clang-tidy --version
 
 ### C++標準
 
-- **C++14準拠必須**
-- C++14の機能を積極的に使用：
+- **C++17準拠必須**
+- C++17の機能を積極的に使用：
+  - Nested namespaces (`namespace A::B {}`)
+  - `if constexpr`
+  - Structured bindings
+  - Fold expressions
+  - `inline`変数
   - 拡張`constexpr`
   - ジェネリックラムダ
   - 戻り値型の自動推論（`auto`）
   - バイナリリテラル・桁区切り
-  - 変数テンプレート
 
 ### 命名規則
 
@@ -170,7 +174,7 @@ bool connect() {
     return true;
 }
 
-std::optional<int> get_value();  // C++17以降で利用可能な場合
+std::optional<int> get_value();  // C++17標準を使用
 ```
 
 **3. RTTI禁止**
@@ -498,28 +502,36 @@ git push origin feature/your-branch
 
 ## テスト方針
 
-### テストの種類
+### テストフレームワーク
 
-**1. インターフェーステスト（モック使用）**
+**doctest** を使用します。ヘッダーオンリーで高速なC++テストフレームワークです。
 
 ```cpp
-// テスト用のモック実装
-class MockSerialContext : public SerialContext {
-public:
-    size_t read(span<uint8_t> buffer) override {
-        // モック動作
-        return test_data.size();
-    }
-    // ... 他のメソッド
-};
+#define DOCTEST_CONFIG_NO_EXCEPTIONS
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
 
-// テスト
-void test_serial_read() {
+TEST_CASE("Serial - モック動作") {
     MockSerialContext serial;
     uint8_t buffer[256];
     size_t n = serial.read(span<uint8_t>(buffer, 256));
-    assert(n > 0);
+    CHECK_GT(n, 0U);
 }
+```
+
+### テストの種類
+
+**1. ユニットテスト（doctest使用）**
+
+```bash
+# テストをビルド
+make tests
+
+# 全テストを実行
+make test
+
+# 個別テストを実行
+./bin/test_fixed_string
 ```
 
 **2. プラットフォーム統合テスト（実機）**
@@ -568,9 +580,13 @@ void loop() {
 ### テスト実行
 
 ```bash
+# ホスト環境でのテスト（doctest）
+make test
+
 # CI環境（自動）
 # - フォーマットチェック
 # - Lintチェック
+# - doctestによるユニットテスト
 
 # 実機環境（手動）
 # - ビルドテスト
@@ -627,5 +643,5 @@ CHANGELOG.md                 # 変更履歴
 
 ---
 
-**Version:** 1.0.1
-**Last Updated:** 2025-11-16
+**Version:** 2.0.0
+**Last Updated:** 2025-11-25

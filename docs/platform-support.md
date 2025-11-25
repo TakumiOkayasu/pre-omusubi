@@ -32,7 +32,7 @@
 | 項目 | 詳細 |
 |------|------|
 | **デフォルトC++** | C++11 |
-| **C++14サポート** | ✅ 完全対応（`-std=c++14`フラグ必須） |
+| **C++14サポート** | ✅ 完全対応 |
 | **C++17サポート** | ✅ 完全対応（`-std=c++17`フラグ） |
 | **C++20サポート** | ⚠️ 部分対応（一部機能制限あり） |
 | **コンパイラ** | GCC 5.2.0+ (xtensa-esp32) |
@@ -70,7 +70,7 @@ lib_deps =
     m5stack/M5Stack@^0.4.3
 
 build_flags =
-    -std=c++14
+    -std=c++17
     -Iinclude
 
 src_filter =
@@ -242,7 +242,7 @@ board = esp32dev
 framework = arduino
 
 build_flags =
-    -std=c++14
+    -std=c++17
     -Iinclude
 
 src_filter =
@@ -377,7 +377,7 @@ target_link_libraries(omusubi_pico pico_stdlib)
 
 | プラットフォーム | デフォルト | C++14 | C++17 | C++20 | C++23 | 備考 |
 |-----------------|----------|-------|-------|-------|-------|------|
-| **M5Stack (ESP32)** | C++11 | ✅ | ✅ | ⚠️ | ❌ | `-std=c++14`フラグ必須 |
+| **M5Stack (ESP32)** | C++11 | ✅ | ✅ | ⚠️ | ❌ | `-std=c++17`フラグ推奨 |
 | **Arduino Uno** | C++11 | ✅ | ✅ | ❌ | ❌ | RAM 2KB制約 |
 | **Arduino Mega** | C++11 | ✅ | ✅ | ❌ | ❌ | RAM 8KB |
 | **Arduino ESP32** | C++11 | ✅ | ✅ | ⚠️ | ❌ | M5Stackと同等 |
@@ -412,5 +412,5 @@ target_link_libraries(omusubi_pico pico_stdlib)
 
 ---
 
-**Version:** 1.2.0
-**Last Updated:** 2025-11-19
+**Version:** 1.3.0
+**Last Updated:** 2025-11-25

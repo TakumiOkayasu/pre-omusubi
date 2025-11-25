@@ -129,7 +129,7 @@ git commit -m "your message"
 `.clang-tidy`ファイルに定義されています。主なチェック：
 
 - バグの可能性がある箇所の検出
-- モダンC++14のベストプラクティス
+- モダンC++17のベストプラクティス
 - パフォーマンスの問題
 - 可読性の問題
 - 命名規則
@@ -165,10 +165,10 @@ chmod +x .git/hooks/pre-commit
 ## 関連ドキュメント
 
 - [Code Quality Tools](code-quality.md) - clang-format/clang-tidyの詳細
-- [C++14互換性ガイド](cpp14_compatibility.md) - C++14準拠の要件
-- CLAUDE.md - コーディング規約全般
+- [C++17機能ガイド](cpp17_features.md) - C++17機能の活用
+- [CLAUDE.md](../CLAUDE.md) - コーディング規約全般
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-16
+**Version:** 1.1.0
+**Last Updated:** 2025-11-25

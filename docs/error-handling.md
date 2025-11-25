@@ -832,8 +832,8 @@ bool connect() {
 
 - [デバッグガイド](debug.md) - ログ出力とデバッグ手法
 - [テストガイド](testing.md) - エラーケースのテスト方法
-- [C++14互換性ガイド](cpp14_compatibility.md) - 例外を使わない理由
-- CLAUDE.md - コーディング規約全般
+- [C++17機能ガイド](cpp17_features.md) - std::optionalの使用
+- [CLAUDE.md](../CLAUDE.md) - コーディング規約全般
 
 ---
 

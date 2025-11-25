@@ -35,11 +35,10 @@
 
 ```cpp
 // 1. テストを先に書く
-void test_new_feature() {
-    test_section("新機能");
-
-    FixedString<32> s;
-    TEST_ASSERT(s.starts_with("H"_sv), "starts_with()が動作する");
+TEST_CASE("FixedString - starts_with機能") {
+    FixedString<32> s("Hello World");
+    CHECK(s.starts_with("Hello"_sv));
+    CHECK_FALSE(s.starts_with("World"_sv));
 }
 
 // 2. 実装を追加
@@ -71,36 +70,41 @@ void test_new_feature() {
 
 ## テストフレームワーク
 
-Omusubiは独自の軽量テストフレームワーク `test_framework.hpp` を使用します。
+Omusubiは**doctest**を使用します。高速で軽量なヘッダーオンリーのC++テストフレームワークです。
 
-### フレームワークの特徴
+### doctestの特徴
 
 ```cpp
-namespace test {
+// 基本的なテスト構造
+#define DOCTEST_CONFIG_NO_EXCEPTIONS
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
 
-// テストスイート開始
-void begin_tests(const char* suite_name);
-
-// テストスイート終了 (失敗数を返す)
-int end_tests();
-
-// テストセクション表示
-void test_section(const char* section_name);
-
-// アサーションマクロ
-TEST_ASSERT(condition, message);
-TEST_ASSERT_EQ(actual, expected, message);
-TEST_ASSERT_STR_EQ(actual, expected, message);
-TEST_ASSERT_FLOAT_EQ(actual, expected, epsilon, message);
-
-} // namespace test
+TEST_CASE("テストケース名") {
+    // テストコード
+    CHECK(condition);
+    CHECK_EQ(actual, expected);
+}
 ```
 
 **利点:**
-- ヘッダーオンリー (依存関係なし)
-- 組み込みシステムで動作 (例外不要)
-- シンプルで理解しやすい
-- 日本語メッセージ対応
+- ヘッダーオンリー（単一ファイル `test/doctest.h`）
+- 例外なしモード対応（`DOCTEST_CONFIG_NO_EXCEPTIONS`）
+- 高速コンパイル
+- 豊富なアサーションマクロ
+- サブケースによるテストの構造化
+
+### doctestのインストール
+
+**自動インストール（推奨）:**
+- Dev Container起動時に最新版が自動的にダウンロードされます
+- `test/doctest.h` に配置されます
+
+**手動更新:**
+```bash
+# 最新版をダウンロード
+curl -L https://raw.githubusercontent.com/doctest/doctest/master/doctest/doctest.h -o test/doctest.h
+```
 
 ---
 
@@ -111,21 +115,17 @@ TEST_ASSERT_FLOAT_EQ(actual, expected, epsilon, message);
 **すべてのテストファイルはこのパターンに従う:**
 
 ```cpp
-// test_example.cpp
+// test/test_example.cpp
+
+#define DOCTEST_CONFIG_NO_EXCEPTIONS
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
 
 #include <omusubi/core/example.hpp>
 
-#include "test_framework.hpp"
-
-namespace example_test {
-
 using namespace omusubi;
-using namespace test;
 
-// テスト関数1
-void test_basic_functionality() {
-    test_section("基本機能");
-
+TEST_CASE("Example - 基本機能") {
     // Arrange (準備)
     Example obj;
 
@@ -133,27 +133,18 @@ void test_basic_functionality() {
     auto result = obj.do_something();
 
     // Assert (検証)
-    TEST_ASSERT(result, "do_something()が成功する");
+    CHECK(result);
 }
 
-// テスト関数2
-void test_edge_cases() {
-    test_section("エッジケース");
+TEST_CASE("Example - エッジケース") {
+    SUBCASE("空の入力") {
+        // テストコード
+    }
 
-    // ...
+    SUBCASE("最大値") {
+        // テストコード
+    }
 }
-
-// main関数
-int main() {
-    begin_tests("Example");
-
-    test_basic_functionality();
-    test_edge_cases();
-
-    return end_tests();
-}
-
-} // namespace example_test
 ```
 
 ### AAA パターン (Arrange-Act-Assert)
@@ -161,9 +152,7 @@ int main() {
 **すべてのテストケースはAAA パターンに従う:**
 
 ```cpp
-void test_fixed_string_append() {
-    test_section("追加操作");
-
+TEST_CASE("FixedString - 追加操作") {
     // Arrange - テスト準備
     FixedString<32> s;
 
@@ -171,8 +160,8 @@ void test_fixed_string_append() {
     bool success = s.append("Hello"_sv);
 
     // Assert - 結果検証
-    TEST_ASSERT(success, "追加が成功する");
-    TEST_ASSERT_EQ(s.byte_length(), 5U, "バイト長が正しい");
+    CHECK(success);
+    CHECK_EQ(s.byte_length(), 5U);
 }
 ```
 
@@ -180,6 +169,36 @@ void test_fixed_string_append() {
 - テストの意図が明確
 - 読みやすい構造
 - デバッグが容易
+
+### SUBCASEによる関連テストのグループ化
+
+**関連するテストケースをSUBCASEでまとめる:**
+
+```cpp
+TEST_CASE("FixedString - 容量管理") {
+    FixedString<10> s;
+
+    SUBCASE("容量内の追加") {
+        CHECK(s.append("Hello"));
+        CHECK_EQ(s.byte_length(), 5U);
+    }
+
+    SUBCASE("容量いっぱいまで追加") {
+        CHECK(s.append("1234567890"));
+        CHECK_EQ(s.byte_length(), 10U);
+    }
+
+    SUBCASE("容量超過時の失敗") {
+        s.append("1234567890");
+        CHECK_FALSE(s.append("X"));
+    }
+}
+```
+
+**SUBCASEの利点:**
+- 共通のセットアップを共有
+- 関連テストを論理的にグループ化
+- 独立した実行（各SUBCASEは新しい状態から開始）
 
 ---
 
@@ -195,137 +214,114 @@ test/
 ├── test_string_view.cpp    # StringViewのテスト
 ├── test_fixed_string.cpp   # FixedString<N>のテスト
 ├── test_fixed_buffer.cpp   # FixedBuffer<N>のテスト
-└── test_vector3.cpp        # Vector3のテスト
+├── test_vector3.cpp        # Vector3のテスト
+├── test_format.cpp         # format()のテスト
+├── test_format_string.cpp  # FormatStringのテスト
+├── test_auto_capacity.cpp  # AutoCapacityのテスト
+├── doctest.h               # doctestフレームワーク
+└── core/
+    ├── test_optional.cpp   # std::optionalのテスト
+    ├── test_result.cpp     # Result<T,E>のテスト
+    └── test_logger.cpp     # Loggerのテスト
 ```
 
-### テスト関数名
+### TEST_CASE名
 
-**`test_[対象]_[機能]()` の形式:**
+**`対象 - 機能説明` の形式:**
 
 ```cpp
-// ✅ 良い例: 明確で具体的
-void test_span_basic();
-void test_span_iteration();
-void test_span_subspan();
-void test_fixed_string_append();
-void test_fixed_string_capacity();
-void test_fixed_string_utf8();
+// 良い例: 明確で具体的
+TEST_CASE("span - 基本機能")
+TEST_CASE("span - イテレーション")
+TEST_CASE("span - サブスパン取得")
+TEST_CASE("FixedString - 追加操作")
+TEST_CASE("FixedString - UTF-8処理")
+TEST_CASE("Result - 成功値の取得")
 
-// ❌ 悪い例: 抽象的で不明確
-void test1();
-void test_misc();
-void test_everything();
+// 悪い例: 抽象的で不明確
+TEST_CASE("test1")
+TEST_CASE("misc")
+TEST_CASE("everything")
 ```
 
-### テストセクション名
+### SUBCASE名
 
-**日本語で機能を説明:**
-
-```cpp
-test_section("基本機能");
-test_section("追加操作");
-test_section("容量制限");
-test_section("UTF-8処理");
-test_section("constexpr対応");
-```
-
-### アサーションメッセージ
-
-**期待される動作を日本語で記述:**
+**機能や条件を説明する簡潔な名前:**
 
 ```cpp
-// ✅ 良い例: 何をテストしているか明確
-TEST_ASSERT_EQ(s.byte_length(), 5U, "バイト長が5である");
-TEST_ASSERT(s.append("Hello"_sv), "追加が成功する");
-TEST_ASSERT_STR_EQ(s.c_str(), "Hello", "内容が一致する");
-
-// ❌ 悪い例: メッセージが無い、または不明確
-TEST_ASSERT_EQ(s.byte_length(), 5U, "test");
-TEST_ASSERT(s.append("Hello"_sv), "ok");
+TEST_CASE("FixedString - 初期化") {
+    SUBCASE("デフォルトコンストラクタ") { }
+    SUBCASE("C文字列からの構築") { }
+    SUBCASE("StringViewからの構築") { }
+}
 ```
 
 ---
 
 ## テスト構造
 
-### テストスイート構成
+### テストファイルの基本構成
 
 ```cpp
-namespace example_test {
+// ヘッダー部分
+#define DOCTEST_CONFIG_NO_EXCEPTIONS
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
 
+// テスト対象のインクルード
+#include <omusubi/core/fixed_string.hpp>
+
+// 名前空間
 using namespace omusubi;
-using namespace test;
+using namespace omusubi::literals;
 
 // ========================================
-// テスト関数群
+// テストケース
 // ========================================
 
-void test_basic() {
-    test_section("基本機能");
-    // テストケース
+TEST_CASE("FixedString - 基本機能") {
+    SUBCASE("デフォルト構築") {
+        FixedString<32> s;
+        CHECK(s.empty());
+        CHECK_EQ(s.byte_length(), 0U);
+    }
+
+    SUBCASE("C文字列からの構築") {
+        FixedString<32> s("Hello");
+        CHECK_EQ(s.byte_length(), 5U);
+    }
 }
 
-void test_advanced() {
-    test_section("高度な機能");
-    // テストケース
-}
-
-// ========================================
-// main関数
-// ========================================
-
-int main() {
-    begin_tests("Example");
-
-    // テスト関数を呼び出す
-    test_basic();
-    test_advanced();
-
-    return end_tests();
-}
-
-} // namespace example_test
-```
-
-### テストセクションの分割
-
-**機能ごとにテスト関数とセクションを分ける:**
-
-```cpp
-void test_fixed_string_basic() {
-    test_section("基本機能");
-
-    // デフォルトコンストラクタ
-    FixedString<32> s1;
-    TEST_ASSERT_EQ(s1.byte_length(), 0U, "デフォルト構築の文字列は空");
-
-    // C文字列からの構築
-    FixedString<32> s2("Hello");
-    TEST_ASSERT_EQ(s2.byte_length(), 5U, "C文字列からのバイト長");
-}
-
-void test_fixed_string_append() {
-    test_section("追加操作");
-
+TEST_CASE("FixedString - 追加操作") {
     FixedString<32> s;
-    TEST_ASSERT(s.append("Hello"_sv), "StringView追加成功");
-    TEST_ASSERT(s.append(" World"), "C文字列追加成功");
+
+    SUBCASE("StringView追加") {
+        CHECK(s.append("Hello"_sv));
+        CHECK_EQ(s.byte_length(), 5U);
+    }
+
+    SUBCASE("連続追加") {
+        CHECK(s.append("Hello"_sv));
+        CHECK(s.append(" World"_sv));
+        CHECK_EQ(s.byte_length(), 11U);
+    }
 }
 
-void test_fixed_string_utf8() {
-    test_section("UTF-8処理");
-
+TEST_CASE("FixedString - UTF-8処理") {
     FixedString<64> s;
     s.append("こんにちは"_sv);
-    TEST_ASSERT_EQ(s.byte_length(), 15U, "日本語のバイト長（5文字×3バイト）");
-    TEST_ASSERT_EQ(s.char_length(), 5U, "日本語の文字数");
+
+    CHECK_EQ(s.byte_length(), 15U);    // 5文字 × 3バイト
+    CHECK_EQ(s.char_length(), 5U);     // 5文字
 }
 ```
 
-**分割の基準:**
-- 1つのテスト関数は1つの機能に集中
-- 5〜15個のアサーションを目安に
-- 長すぎる場合は細分化する
+### テストセクションの分割基準
+
+- 1つのTEST_CASEは1つの機能カテゴリに集中
+- SUBCASEで具体的なシナリオを分割
+- 5〜15個のチェックを目安に
+- 長すぎる場合は別のTEST_CASEに分割
 
 ---
 
@@ -333,66 +329,95 @@ void test_fixed_string_utf8() {
 
 ### 基本アサーション
 
-**`TEST_ASSERT(condition, message)`**
+**`CHECK(condition)`** - 条件が真であることを検証（失敗しても続行）
 
 ```cpp
-// 条件が真であることを検証
-TEST_ASSERT(s.empty(), "文字列が空である");
-TEST_ASSERT(!s.empty(), "文字列が空でない");
-TEST_ASSERT(result, "操作が成功する");
+CHECK(s.empty());
+CHECK(!s.empty());
+CHECK(result);
 ```
 
-### 等価比較アサーション
-
-**`TEST_ASSERT_EQ(actual, expected, message)`**
+**`REQUIRE(condition)`** - 条件が真であることを検証（失敗したら停止）
 
 ```cpp
-// 数値の等価性
-TEST_ASSERT_EQ(s.byte_length(), 5U, "バイト長が5");
-TEST_ASSERT_EQ(count, 3, "カウントが3");
-TEST_ASSERT_EQ(index, 0U, "インデックスが0");
+REQUIRE(ptr != nullptr);  // nullptrならここで停止
+ptr->method();            // 安全にアクセス可能
 ```
 
-**注意:**
-- 符号付き/符号なし比較に注意 (`5U` vs `5`)
-- `expected`を右側に配置 (読みやすさ)
+### 比較アサーション
 
-### 文字列比較アサーション
-
-**`TEST_ASSERT_STR_EQ(actual, expected, message)`**
+**`CHECK_EQ(actual, expected)`** - 等価比較
 
 ```cpp
-// C文字列の比較
-TEST_ASSERT_STR_EQ(s.c_str(), "Hello", "内容が'Hello'");
-TEST_ASSERT_STR_EQ(buffer, "", "バッファが空");
+CHECK_EQ(s.byte_length(), 5U);
+CHECK_EQ(count, 3);
+CHECK_EQ(result.value(), 42);
 ```
 
-### 浮動小数点比較アサーション
-
-**`TEST_ASSERT_FLOAT_EQ(actual, expected, epsilon, message)`**
+**`CHECK_NE(actual, expected)`** - 非等価比較
 
 ```cpp
-// 浮動小数点の比較 (誤差許容)
-TEST_ASSERT_FLOAT_EQ(v.x, 1.0F, 0.0001F, "x座標が1.0");
-TEST_ASSERT_FLOAT_EQ(angle, 3.14159F, 0.00001F, "角度がπ");
+CHECK_NE(ptr, nullptr);
+CHECK_NE(status, Error::OK);
 ```
 
-**epsilon の選び方:**
-- 単精度float: `0.0001F` 〜 `0.00001F`
-- 倍精度double: `0.0000001` 〜 `0.00000001`
-- センサー値: `0.01F` 〜 `0.1F` (ハードウェアの精度に依存)
-
-### アサーション使い分け
+**`CHECK_LT / CHECK_LE / CHECK_GT / CHECK_GE`** - 大小比較
 
 ```cpp
-// ✅ 良い例: 適切なアサーションを使用
-TEST_ASSERT_EQ(count, 5, "カウントが5");              // 整数比較
-TEST_ASSERT_STR_EQ(s.c_str(), "Hello", "文字列一致"); // 文字列比較
-TEST_ASSERT_FLOAT_EQ(x, 1.0F, 0.001F, "浮動小数点");  // 浮動小数点比較
+CHECK_LT(value, 100);   // value < 100
+CHECK_LE(value, 100);   // value <= 100
+CHECK_GT(value, 0);     // value > 0
+CHECK_GE(value, 0);     // value >= 0
+```
 
-// ❌ 悪い例: 不適切なアサーション
-TEST_ASSERT(count == 5, "カウントが5");  // TEST_ASSERT_EQを使うべき
-TEST_ASSERT(strcmp(s.c_str(), "Hello") == 0, "文字列一致");  // TEST_ASSERT_STR_EQを使うべき
+### 否定アサーション
+
+**`CHECK_FALSE(condition)`** - 条件が偽であることを検証
+
+```cpp
+CHECK_FALSE(s.empty());
+CHECK_FALSE(buffer.full());
+CHECK_FALSE(result.is_err());
+```
+
+### 浮動小数点比較
+
+**`CHECK(a == doctest::Approx(b))`** - 許容誤差付き比較
+
+```cpp
+CHECK(v.x == doctest::Approx(1.0F).epsilon(0.0001F));
+CHECK(angle == doctest::Approx(3.14159F).epsilon(0.00001F));
+```
+
+### 文字列比較
+
+```cpp
+// StringViewとの比較
+CHECK_EQ(s.view(), "Hello"_sv);
+
+// C文字列との比較
+CHECK(strcmp(s.c_str(), "Hello") == 0);
+```
+
+### アサーション使い分けガイド
+
+```cpp
+// 条件チェック
+CHECK(result.is_ok());          // booleanの検証
+
+// 数値比較（型を明示）
+CHECK_EQ(count, 5);             // int
+CHECK_EQ(length, 5U);           // unsigned
+
+// 浮動小数点
+CHECK(x == doctest::Approx(1.0F));
+
+// ポインタ
+CHECK_NE(ptr, nullptr);
+REQUIRE_NE(ptr, nullptr);       // 後続のコードが依存する場合
+
+// 否定
+CHECK_FALSE(error_occurred);
 ```
 
 ---
@@ -414,91 +439,76 @@ TEST_ASSERT(strcmp(s.c_str(), "Hello") == 0, "文字列一致");  // TEST_ASSERT
 **1. 正常系 (Happy Path)**
 
 ```cpp
-void test_normal_case() {
-    test_section("正常系");
-
+TEST_CASE("FixedString - 正常系") {
     FixedString<32> s;
-    TEST_ASSERT(s.append("Hello"_sv), "通常の追加が成功");
-    TEST_ASSERT_EQ(s.byte_length(), 5U, "正しいバイト長");
+    CHECK(s.append("Hello"_sv));
+    CHECK_EQ(s.byte_length(), 5U);
 }
 ```
 
 **2. 境界値 (Boundary)**
 
 ```cpp
-void test_boundary() {
-    test_section("境界値");
-
+TEST_CASE("FixedString - 境界値") {
     FixedString<10> s;
 
-    // 容量いっぱい
-    TEST_ASSERT(s.append("1234567890"), "容量いっぱいまで追加成功");
-    TEST_ASSERT_EQ(s.byte_length(), 10U, "バイト長が容量と一致");
+    SUBCASE("容量いっぱい") {
+        CHECK(s.append("1234567890"));
+        CHECK_EQ(s.byte_length(), 10U);
+    }
 
-    // 容量超過
-    TEST_ASSERT(!s.append("X"), "容量超過は失敗");
+    SUBCASE("容量超過") {
+        s.append("1234567890");
+        CHECK_FALSE(s.append("X"));
+    }
 }
 ```
 
 **3. エラー系 (Error Cases)**
 
 ```cpp
-void test_error_cases() {
-    test_section("エラー処理");
-
+TEST_CASE("span - エラー系") {
     span<int> empty_span;
-    TEST_ASSERT(empty_span.empty(), "空のspanはempty()がtrue");
-
-    // 範囲外アクセス (デバッグビルドでassertされるべき)
-    // リリースビルドでは未定義動作のためテストしない
+    CHECK(empty_span.empty());
+    CHECK_EQ(empty_span.size(), 0U);
 }
 ```
 
 **4. エッジケース (Edge Cases)**
 
 ```cpp
-void test_edge_cases() {
-    test_section("エッジケース");
+TEST_CASE("FixedString - エッジケース") {
+    SUBCASE("空文字列") {
+        FixedString<32> empty;
+        CHECK_EQ(empty.byte_length(), 0U);
+        CHECK(empty.empty());
+    }
 
-    // 空文字列
-    FixedString<32> empty;
-    TEST_ASSERT_EQ(empty.byte_length(), 0U, "空文字列のバイト長は0");
-    TEST_ASSERT_STR_EQ(empty.c_str(), "", "空文字列の内容");
+    SUBCASE("1文字") {
+        FixedString<32> single("A");
+        CHECK_EQ(single.byte_length(), 1U);
+    }
 
-    // 1文字
-    FixedString<32> single("A");
-    TEST_ASSERT_EQ(single.byte_length(), 1U, "1文字のバイト長");
-
-    // UTF-8マルチバイト文字
-    FixedString<32> multibyte("あ");
-    TEST_ASSERT_EQ(multibyte.byte_length(), 3U, "マルチバイト文字のバイト長");
-    TEST_ASSERT_EQ(multibyte.char_length(), 1U, "マルチバイト文字の文字数");
+    SUBCASE("マルチバイト文字") {
+        FixedString<32> multibyte("あ");
+        CHECK_EQ(multibyte.byte_length(), 3U);
+        CHECK_EQ(multibyte.char_length(), 1U);
+    }
 }
 ```
 
 **5. constexpr 検証**
 
 ```cpp
-void test_constexpr() {
-    test_section("constexpr対応");
-
-    // コンパイル時計算
-    {
-        constexpr auto s = fixed_string("Hello");
-        static_assert(s.byte_length() == 5, "constexpr byte_length()");
-        static_assert(s.capacity() == 5, "constexpr capacity()");
-    }
-
-    // コンパイル時UTF-8処理
-    {
-        constexpr auto s = fixed_string("こんにちは");
-        static_assert(s.byte_length() == 15, "constexpr UTF-8バイト長");
-        static_assert(s.char_length() == 5, "constexpr UTF-8文字数");
-    }
+TEST_CASE("FixedString - constexpr対応") {
+    // コンパイル時検証
+    constexpr auto s = fixed_string("Hello");
+    static_assert(s.byte_length() == 5, "constexpr byte_length()");
+    static_assert(s.capacity() == 5, "constexpr capacity()");
 
     // 実行時検証も追加
-    auto runtime_str = fixed_string("Hello");
-    TEST_ASSERT_EQ(runtime_str.byte_length(), 5U, "constexpr関数の実行時使用");
+    CHECK_EQ(s.byte_length(), 5U);
+    CHECK_EQ(s.capacity(), 5U);
 }
 ```
 
@@ -514,8 +524,6 @@ void test_constexpr() {
 
 ```cpp
 // テスト用モック実装
-namespace test {
-
 class MockSerialContext : public SerialContext {
 private:
     FixedBuffer<256> read_buffer_;
@@ -533,7 +541,7 @@ public:
         connected_ = false;
     }
 
-    bool is_connected() const override {
+    [[nodiscard]] bool is_connected() const override {
         return connected_;
     }
 
@@ -548,17 +556,8 @@ public:
         return count;
     }
 
-    size_t available() const override {
+    [[nodiscard]] size_t available() const override {
         return read_buffer_.size();
-    }
-
-    // ByteWritable interface
-    size_t write(span<const uint8_t> data) override {
-        write_buffer_.clear();
-        for (auto byte : data) {
-            write_buffer_.append(byte);
-        }
-        return data.size();
     }
 
     // テスト用ヘルパー
@@ -569,57 +568,27 @@ public:
         }
     }
 
-    StringView get_written_data() const {
+    [[nodiscard]] StringView get_written_data() const {
         return StringView(
             reinterpret_cast<const char*>(write_buffer_.data()),
             write_buffer_.size()
         );
     }
 };
-
-} // namespace test
 ```
 
 ### モックを使ったテスト
 
 ```cpp
-void test_with_mock() {
-    test_section("モックを使ったテスト");
-
-    // Arrange
-    test::MockSerialContext mock_serial;
+TEST_CASE("Serial - モックを使ったテスト") {
+    MockSerialContext mock_serial;
     mock_serial.set_read_data("Hello"_sv);
 
-    // Act
     uint8_t buffer[10];
     size_t bytes_read = mock_serial.read(span<uint8_t>(buffer, 10));
 
-    // Assert
-    TEST_ASSERT_EQ(bytes_read, 5U, "5バイト読み取り");
-    TEST_ASSERT_EQ(buffer[0], 'H', "最初の文字が'H'");
-}
-```
-
-### スタブの使用
-
-**外部依存を排除したい場合にスタブを使用:**
-
-```cpp
-// スタブ: 常に固定値を返す
-class StubSensorContext : public AccelerometerContext {
-public:
-    Vector3 get_values() const override {
-        return Vector3{0.0F, 0.0F, 9.8F};  // 常に静止状態
-    }
-};
-
-void test_with_stub() {
-    test_section("スタブを使ったテスト");
-
-    StubSensorContext stub;
-    auto values = stub.get_values();
-
-    TEST_ASSERT_FLOAT_EQ(values.z, 9.8F, 0.1F, "重力加速度が正しい");
+    CHECK_EQ(bytes_read, 5U);
+    CHECK_EQ(buffer[0], 'H');
 }
 ```
 
@@ -634,40 +603,46 @@ void test_with_stub() {
 1. **メモリ制約**: ヒープアロケーション禁止
 2. **実行時間**: リアルタイム性を損なわない
 3. **ハードウェア依存**: モック/スタブで分離
-4. **例外なし**: エラーは戻り値で通知
+4. **例外なし**: `DOCTEST_CONFIG_NO_EXCEPTIONS`を使用
 
 ### ホスト環境でのテスト (推奨)
 
 **開発マシン (Linux/macOS/Windows) でテストを実行:**
 
 ```bash
-# ホスト環境でビルド・実行
-cd test
-clang++ -std=c++14 -Wall -Wextra -I../include \
-    test_all.cpp \
-    test_span.cpp \
-    test_string_view.cpp \
-    test_fixed_string.cpp \
-    test_fixed_buffer.cpp \
-    test_vector3.cpp \
-    -o test_runner
-
-# テスト実行
-./test_runner
+# Makefileを使用してテストをビルド・実行
+make test
 
 # 出力例:
-# ╔═══════════════════════════════════════╗
-# ║  Omusubi フレームワーク 単体テスト    ║
-# ╚═══════════════════════════════════════╝
+# Running all tests with doctest...
 #
 # ========================================
-# テストスイート: span<T>
+# Running bin/test_optional...
 # ========================================
-# [基本機能]
-#   ✓ 空のspanはempty()がtrue
-#   ✓ 空のspanのサイズは0
-#   ...
-# 結果: 127 / 127 テスト成功
+# [doctest] doctest version is "2.4.11"
+# [doctest] run with "--help" for options
+# ===============================================================================
+# [doctest] test cases:  5 |  5 passed | 0 failed | 0 skipped
+# [doctest] assertions: 42 | 42 passed | 0 failed |
+# ...
+# ========================================
+# All tests passed successfully!
+# ========================================
+```
+
+**個別テストの実行:**
+
+```bash
+# テストをビルド
+make tests
+
+# 個別テスト実行
+./bin/test_fixed_string
+
+# doctestオプション
+./bin/test_fixed_string --help           # ヘルプ表示
+./bin/test_fixed_string -tc="*UTF-8*"    # 特定のテストケースのみ実行
+./bin/test_fixed_string -s               # 成功したテストも表示
 ```
 
 **利点:**
@@ -687,23 +662,26 @@ clang++ -std=c++14 -Wall -Wextra -I../include \
 // examples/platform/m5stack/test_on_device.cpp
 
 #include <omusubi/omusubi.h>
-#include "test_framework.hpp"
 
 using namespace omusubi;
-using namespace test;
+using namespace omusubi::literals;
 
 SystemContext& ctx = get_system_context();
 SerialContext* serial = nullptr;
 
 void test_serial_loopback() {
-    test_section("シリアル通信テスト");
-
-    serial->write("Hello"_sv);
+    serial->write_text("Hello"_sv);
     ctx.delay(100);
 
     uint8_t buffer[10];
     size_t bytes = serial->read(span<uint8_t>(buffer, 10));
-    TEST_ASSERT_EQ(bytes, 5U, "5バイト読み取り");
+
+    // 結果をシリアル出力で確認
+    if (bytes == 5) {
+        serial->write_text("[PASS] Serial loopback\r\n"_sv);
+    } else {
+        serial->write_text("[FAIL] Serial loopback\r\n"_sv);
+    }
 }
 
 void setup() {
@@ -711,9 +689,7 @@ void setup() {
     serial = ctx.get_connectable_context()->get_serial_context(0);
     serial->connect();
 
-    begin_tests("実機テスト");
     test_serial_loopback();
-    end_tests();
 }
 
 void loop() {
@@ -746,24 +722,24 @@ pio device monitor
 ### 1. 1つのテストは1つのことを検証
 
 ```cpp
-// ✅ 良い例: 1つの機能を検証
-void test_append_success() {
+// 良い例: 1つの機能を検証
+TEST_CASE("append - 成功") {
     FixedString<32> s;
-    TEST_ASSERT(s.append("Hello"_sv), "追加が成功する");
+    CHECK(s.append("Hello"_sv));
 }
 
-void test_append_capacity() {
+TEST_CASE("append - 容量超過") {
     FixedString<10> s("1234567890");
-    TEST_ASSERT(!s.append("X"), "容量超過時は失敗する");
+    CHECK_FALSE(s.append("X"));
 }
 
-// ❌ 悪い例: 複数の機能を混在
-void test_append() {
+// 悪い例: 複数の機能を混在
+TEST_CASE("append") {
     FixedString<32> s1;
-    TEST_ASSERT(s1.append("Hello"_sv), "追加成功");
+    CHECK(s1.append("Hello"_sv));
 
     FixedString<10> s2("1234567890");
-    TEST_ASSERT(!s2.append("X"), "容量超過");
+    CHECK_FALSE(s2.append("X"));
     // 2つの異なるケースが混在している
 }
 ```
@@ -771,62 +747,61 @@ void test_append() {
 ### 2. テストは独立させる
 
 ```cpp
-// ✅ 良い例: 各テストで新しいオブジェクトを作成
-void test_clear() {
+// 良い例: 各テストで新しいオブジェクトを作成
+TEST_CASE("clear") {
     FixedString<32> s("Hello");
     s.clear();
-    TEST_ASSERT_EQ(s.byte_length(), 0U, "クリア後は空");
+    CHECK_EQ(s.byte_length(), 0U);
 }
 
-void test_append() {
+TEST_CASE("append") {
     FixedString<32> s;  // 新しいオブジェクト
-    TEST_ASSERT(s.append("World"_sv), "追加成功");
+    CHECK(s.append("World"_sv));
 }
 
-// ❌ 悪い例: グローバル変数でテスト間に依存
+// 悪い例: グローバル変数でテスト間に依存
 FixedString<32> global_str;  // テスト間で共有
 
-void test_append() {
+TEST_CASE("append") {
     global_str.append("Hello");  // 前のテストの状態に依存
 }
 ```
 
-### 3. 明確なエラーメッセージ
+### 3. CHECKとREQUIREの使い分け
 
 ```cpp
-// ✅ 良い例: 何が期待されるか明確
-TEST_ASSERT_EQ(s.byte_length(), 5U, "バイト長が5である");
-TEST_ASSERT(result, "connect()が成功する");
-TEST_ASSERT(!buffer.full(), "バッファが満杯でない");
+TEST_CASE("ポインタ操作") {
+    auto* ptr = get_device();
 
-// ❌ 悪い例: メッセージが不明確
-TEST_ASSERT_EQ(s.byte_length(), 5U, "test");
-TEST_ASSERT(result, "ok");
-TEST_ASSERT(!buffer.full(), "check");
+    // REQUIRE: 後続のコードが依存する場合
+    REQUIRE_NE(ptr, nullptr);
+
+    // CHECK: 独立した検証
+    CHECK(ptr->is_connected());
+    CHECK_EQ(ptr->get_status(), Status::OK);
+}
 ```
 
 ### 4. constexpr 関数は static_assert でも検証
 
 ```cpp
-void test_constexpr() {
+TEST_CASE("constexpr検証") {
     // コンパイル時検証
     constexpr auto s = fixed_string("Hello");
     static_assert(s.byte_length() == 5, "constexpr計算");
     static_assert(s.capacity() == 5, "constexpr容量");
 
-    // 実行時検証 (必須)
-    TEST_ASSERT_EQ(s.byte_length(), 5U, "実行時のバイト長");
-    TEST_ASSERT_EQ(s.capacity(), 5U, "実行時の容量");
+    // 実行時検証（必須）
+    CHECK_EQ(s.byte_length(), 5U);
+    CHECK_EQ(s.capacity(), 5U);
 }
 ```
 
 ### 5. テストコードも読みやすく
 
 ```cpp
-// ✅ 良い例: AAA パターンで構造化
-void test_example() {
-    test_section("例");
-
+// 良い例: AAA パターンで構造化
+TEST_CASE("example") {
     // Arrange
     FixedString<32> s;
 
@@ -834,8 +809,8 @@ void test_example() {
     auto result = s.append("Hello"_sv);
 
     // Assert
-    TEST_ASSERT(result, "追加が成功する");
-    TEST_ASSERT_EQ(s.byte_length(), 5U, "バイト長が正しい");
+    CHECK(result);
+    CHECK_EQ(s.byte_length(), 5U);
 }
 ```
 
@@ -843,36 +818,39 @@ void test_example() {
 
 ## テスト実行
 
-### ホスト環境でのテスト実行
+### Makefileコマンド
 
 ```bash
-# テストをビルド
-cd test
-clang++ -std=c++14 -Wall -Wextra -I../include \
-    test_all.cpp \
-    test_span.cpp \
-    test_string_view.cpp \
-    test_fixed_string.cpp \
-    test_fixed_buffer.cpp \
-    test_vector3.cpp \
-    -o test_runner
+# 全テストをビルド
+make tests
 
-# テスト実行
-./test_runner
+# 全テストをビルドして実行
+make test
 
-# 出力例:
-# ╔═══════════════════════════════════════╗
-# ║  Omusubi フレームワーク 単体テスト    ║
-# ╚═══════════════════════════════════════╝
-#
-# ========================================
-# テストスイート: span<T>
-# ========================================
-# [基本機能]
-#   ✓ 空のspanはempty()がtrue
-#   ✓ 空のspanのサイズは0
-#   ...
-# 結果: 127 / 127 テスト成功
+# テストバイナリを削除
+make clean-tests
+
+# 全てを削除（ビルド成果物 + テスト）
+make clean-all
+```
+
+### doctestコマンドラインオプション
+
+```bash
+# ヘルプ表示
+./bin/test_fixed_string --help
+
+# 特定のテストケースのみ実行
+./bin/test_fixed_string -tc="*UTF-8*"
+
+# 成功したテストも表示
+./bin/test_fixed_string -s
+
+# 特定のサブケースのみ実行
+./bin/test_fixed_string -sc="空文字列"
+
+# テストケース一覧表示
+./bin/test_fixed_string -ltc
 ```
 
 ### CI での自動テスト
@@ -892,11 +870,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: Install Clang
         run: sudo apt-get install -y clang
-      - name: Run Tests
+      - name: Download doctest
         run: |
-          cd test
-          make
-          ./test_runner
+          curl -L https://raw.githubusercontent.com/doctest/doctest/master/doctest/doctest.h -o test/doctest.h
+      - name: Build and Run Tests
+        run: make test
 ```
 
 ---
@@ -912,9 +890,7 @@ jobs:
 - [ ] constexpr 関数を static_assert で検証している
 - [ ] AAA パターンに従っている
 - [ ] テストは独立している
-- [ ] エラーメッセージが明確である
-- [ ] テスト関数名が適切である
-- [ ] テストセクションで分類している
+- [ ] TEST_CASE/SUBCASE名が適切である
 - [ ] ホスト環境でテストが通る
 - [ ] 実機でも検証した (プラットフォーム実装の場合)
 
@@ -923,10 +899,11 @@ jobs:
 ## 関連ドキュメント
 
 - [エラーハンドリングガイド](error-handling.md) - テスト時のエラーケース検証
-- CLAUDE.md - コーディング規約全般
+- [CLAUDE.md](../CLAUDE.md) - コーディング規約全般
 - [デバッグガイド](debug.md) - テスト失敗時のデバッグ手法
+- [doctest公式ドキュメント](https://github.com/doctest/doctest/blob/master/doc/markdown/readme.md)
 
 ---
 
-**Version:** 2.0.0
-**Last Updated:** 2025-11-17
+**Version:** 3.0.0
+**Last Updated:** 2025-11-25

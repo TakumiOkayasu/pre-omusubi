@@ -123,7 +123,7 @@ clang-tidyはコードの静的解析を行い、以下を検出します：
 | `cppcoreguidelines-*` | ベストプラクティス | C++ Core Guidelines準拠 |
 | `performance-*` | 最適化 | 不要なコピー、ムーブセマンティクス |
 | `readability-*` | 可読性 | 命名、複雑度、マジックナンバー |
-| `modernize-*` | C++17イディオム | `nullptr`, `auto`, nested namespacesなど |
+| `modernize-*` | モダンC++イディオム | `nullptr`, `auto`, `if constexpr`, nested namespacesなど |
 
 ### 命名規則
 
@@ -174,13 +174,13 @@ namespace m5stack {
 ./scripts/lint.sh
 
 # 単一ファイルをLint
-clang-tidy src/main.cpp -- -Iinclude -std=c++14
+clang-tidy src/main.cpp -- -Iinclude -std=c++17
 
 # すべてのソースファイルをLint
-find src -name "*.cpp" -exec clang-tidy {} -- -Iinclude -std=c++14 \;
+find src -name "*.cpp" -exec clang-tidy {} -- -Iinclude -std=c++17 \;
 
 # 自動修正（注意して使用）
-clang-tidy -fix src/main.cpp -- -Iinclude -std=c++14
+clang-tidy -fix src/main.cpp -- -Iinclude -std=c++17
 ```
 
 ### 警告の抑制
@@ -364,7 +364,7 @@ Checks: >
 
 - [開発ガイド](DEVELOPMENT.md) - コード品質管理の実践ガイド
 - [C++17機能ガイド](cpp17_features.md) - C++17機能の活用
-- CLAUDE.md - 命名規則とコーディング規約
+- [CLAUDE.md](../CLAUDE.md) - 命名規則とコーディング規約
 
 ## 参考資料
 
@@ -375,5 +375,5 @@ Checks: >
 
 ---
 
-**Version:** 1.0.1
-**Last Updated:** 2025-11-16
+**Version:** 1.1.0
+**Last Updated:** 2025-11-25

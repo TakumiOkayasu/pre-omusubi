@@ -47,7 +47,7 @@
 ```makefile
 # Compiler and flags
 CXX = clang++
-CXXFLAGS = -std=c++14 -Wall -Wextra -Iinclude
+CXXFLAGS = -std=c++17 -Wall -Wextra -Iinclude
 
 # Directories
 SRC_DIR = src
@@ -114,22 +114,47 @@ endif
 # make BUILD=release  # リリースビルド
 ```
 
-### 3. テストビルド
+### 3. テストビルド（doctest使用）
 
 ```makefile
-# Test configuration
+# Test configuration with doctest
 TEST_DIR = test
-TEST_SRCS = $(shell find $(TEST_DIR) -type f -name '*.cpp')
-TEST_TARGET = test_runner
+BIN_DIR = bin
 
-test: $(TEST_TARGET)
-	./$(TEST_TARGET)
+# Tests in test/core/ directory
+CORE_TESTS = test_optional test_result test_logger
+CORE_TEST_BINS = $(patsubst %,$(BIN_DIR)/%,$(CORE_TESTS))
 
-$(TEST_TARGET): $(TEST_SRCS) $(HEADERS)
-	$(CXX) $(CXXFLAGS) -o $(TEST_TARGET) $(TEST_SRCS)
+# Tests in test/ directory
+BASIC_TESTS = test_auto_capacity test_format test_format_string test_fixed_string test_fixed_buffer test_span test_string_view test_vector3
+BASIC_TEST_BINS = $(patsubst %,$(BIN_DIR)/%,$(BASIC_TESTS))
 
-.PHONY: test
+# All test binaries
+ALL_TEST_BINS = $(CORE_TEST_BINS) $(BASIC_TEST_BINS)
+
+# Build all tests
+tests: $(ALL_TEST_BINS)
+
+# Build tests in test/ directory
+$(BIN_DIR)/test_%: $(TEST_DIR)/test_%.cpp $(TEST_DIR)/doctest.h $(HEADERS)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+# Run all tests
+test: tests
+	@for test in $(ALL_TEST_BINS); do \
+		echo "Running $$test..."; \
+		$$test || exit 1; \
+	done
+
+.PHONY: tests test
 ```
+
+**doctest の特徴:**
+- ヘッダーオンリー（`test/doctest.h`）
+- 例外なしモード対応（`DOCTEST_CONFIG_NO_EXCEPTIONS`）
+- 高速コンパイル
+- 各テストファイルは独立した実行可能ファイルとしてビルド
 
 ---
 
@@ -139,7 +164,7 @@ $(TEST_TARGET): $(TEST_SRCS) $(HEADERS)
 
 ```makefile
 # C++ standard
-CXXFLAGS += -std=c++14
+CXXFLAGS += -std=c++17
 
 # Warnings
 CXXFLAGS += -Wall -Wextra -Wpedantic
@@ -317,7 +342,7 @@ default_envs = m5stack
 [env]
 framework = arduino
 build_flags =
-    -std=c++14
+    -std=c++17
     -Wall
     -Wextra
     -Iinclude
@@ -526,8 +551,8 @@ make PLATFORM=m5stack
 **問題: `error: 'constexpr' needed for in-class initialization`**
 
 ```bash
-# 解決策: C++14 モードを確認
-make CXXFLAGS="-std=c++14"
+# 解決策: C++17 モードを確認
+make CXXFLAGS="-std=c++17"
 ```
 
 ### 2. PlatformIO エラー
@@ -556,5 +581,5 @@ pio run --target upload --upload-port /dev/ttyUSB0
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-17
+**Version:** 2.0.0
+**Last Updated:** 2025-11-25

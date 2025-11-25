@@ -674,5 +674,5 @@ SerialContext* serial = ctx.get_serial_context<0>();
 
 ---
 
-**Version:** 2.0.0
-**Last Updated:** 2025-11-16
+**Version:** 2.1.0
+**Last Updated:** 2025-11-25

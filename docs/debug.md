@@ -32,10 +32,10 @@
 
 ```makefile
 # デバッグビルド
-CXXFLAGS_DEBUG = -std=c++14 -g -O0 -DDEBUG
+CXXFLAGS_DEBUG = -std=c++17 -g -O0 -DDEBUG
 
 # リリースビルド
-CXXFLAGS_RELEASE = -std=c++14 -O2 -DNDEBUG
+CXXFLAGS_RELEASE = -std=c++17 -O2 -DNDEBUG
 ```
 
 **デバッグビルドの特徴:**
@@ -342,7 +342,7 @@ public:
 
 ```bash
 # デバッグビルド
-clang++ -std=c++14 -g -O0 main.cpp -o main
+clang++ -std=c++17 -g -O0 main.cpp -o main
 
 # GDB起動
 gdb ./main
@@ -694,5 +694,5 @@ void loop() {
 
 ---
 
-**Version:** 1.2.0
-**Last Updated:** 2025-11-17
+**Version:** 1.3.0
+**Last Updated:** 2025-11-25
