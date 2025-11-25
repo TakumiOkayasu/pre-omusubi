@@ -2,8 +2,7 @@
 
 namespace omusubi {
 
-// 前方宣言
-// TODO: 実際の入力デバイスContextクラスを作成後、ここに追加
+// 前方宣言（将来実装予定）
 // class ButtonContext;
 // class TouchContext;
 
@@ -19,10 +18,8 @@ public:
     InputContext(InputContext&&) = delete;
     InputContext& operator=(InputContext&&) = delete;
 
-    // TODO: 入力デバイスのgetterメソッドをここに追加
-    // virtual ButtonContext* get_button0_context() = 0;
-    // virtual ButtonContext* get_button1_context() = 0;
-    // virtual ButtonContext* get_button2_context() = 0;
+    // 入力デバイスのgetterメソッド（将来実装予定）
+    // virtual ButtonContext* get_button_context(uint8_t index) = 0;
     // virtual TouchContext* get_touch_context() = 0;
 };
 

@@ -151,7 +151,7 @@ test: tests
 ```
 
 **doctest の特徴:**
-- ヘッダーオンリー（`test/doctest.h`）
+- ヘッダーオンリー（`tests/doctest.h`）
 - 例外なしモード対応（`DOCTEST_CONFIG_NO_EXCEPTIONS`）
 - 高速コンパイル
 - 各テストファイルは独立した実行可能ファイルとしてビルド

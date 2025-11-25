@@ -115,7 +115,7 @@ curl -L https://raw.githubusercontent.com/doctest/doctest/master/doctest/doctest
 **すべてのテストファイルはこのパターンに従う:**
 
 ```cpp
-// test/test_example.cpp
+// tests/test_example.cpp
 
 #define DOCTEST_CONFIG_NO_EXCEPTIONS
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN

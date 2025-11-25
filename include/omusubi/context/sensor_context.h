@@ -2,8 +2,7 @@
 
 namespace omusubi {
 
-// 前方宣言
-// TODO: 実際のセンサーContextクラスを作成後、ここに追加
+// 前方宣言（将来実装予定）
 // class AccelerometerContext;
 // class GyroscopeContext;
 // class TemperatureContext;
@@ -20,7 +19,7 @@ public:
     SensorContext(SensorContext&&) = delete;
     SensorContext& operator=(SensorContext&&) = delete;
 
-    // TODO: センサーデバイスのgetterメソッドをここに追加
+    // センサーデバイスのgetterメソッド（将来実装予定）
     // virtual AccelerometerContext* get_accelerometer_context() = 0;
     // virtual GyroscopeContext* get_gyroscope_context() = 0;
     // virtual TemperatureContext* get_temperature_context() = 0;

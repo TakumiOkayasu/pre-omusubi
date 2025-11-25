@@ -147,7 +147,7 @@ make test
 詳細は以下を参照してください:
 
 - **[CLAUDE.md](CLAUDE.md)** - 開発ガイドとアーキテクチャ詳細
-- **[DEVELOPMENT.md](DEVELOPMENT.md)** - 開発環境とワークフロー
+- **[DEVELOPMENT.md](docs/DEVELOPMENT.md)** - 開発環境とワークフロー
 - **[docs/](docs/)** - 技術ドキュメント
   - [architecture.md](docs/architecture.md) - アーキテクチャ設計
   - [licenses.md](docs/licenses.md) - ライセンスと依存関係

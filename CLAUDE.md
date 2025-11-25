@@ -42,7 +42,7 @@ make test         # Build and run all tests
 **Using doctest (latest)** - Fast, header-only C++ testing framework
 
 ### Key Features
-- **Header-only**: Single file `test/doctest.h`
+- **Header-only**: Single file `tests/doctest.h`
 - **No exceptions**: `DOCTEST_CONFIG_NO_EXCEPTIONS` enabled
 - **C++17 compatible**: Fully supports modern C++17 features
 - **Fast compilation**: Minimal compile-time overhead
@@ -54,12 +54,12 @@ make test         # Build and run all tests
 **Automatic (Recommended):**
 - Latest doctest is automatically downloaded during devcontainer build
 - Located at `/usr/local/include/doctest/doctest.h` in container
-- Copied to `test/doctest.h` on container startup via `postCreateCommand`
+- Copied to `tests/doctest.h` on container startup via `postCreateCommand`
 
 **Manual Update:**
 ```bash
 # Update to latest version manually
-curl -L https://raw.githubusercontent.com/doctest/doctest/master/doctest/doctest.h -o test/doctest.h
+curl -L https://raw.githubusercontent.com/doctest/doctest/master/doctest/doctest.h -o tests/doctest.h
 ```
 
 **Docker Build Process:**
@@ -479,7 +479,7 @@ public:
 
 ## Writing Examples
 
-Pattern for `examples/platform/m5stack/`:
+Pattern for M5Stack platform examples (※実機用コードは別リポジトリで管理):
 ```cpp
 // [Japanese comment explaining what the example does]
 #include <omusubi/omusubi.h>
