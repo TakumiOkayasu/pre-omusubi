@@ -195,6 +195,35 @@ auto retry_count = 0;  // Wrong - int, not uint32_t
 - **Header guards:** `#pragma once`
 - **`std::move()`:** DO NOT use - prevents RVO, unnecessary for small stack objects
 - **Comments:** Only when essential - code should be self-explanatory
+- **String formatting:** ALWAYS use `format()` for string composition - avoid multiple write calls or manual concatenation
+
+**String Formatting with format() (CRITICAL)**
+- **ALWAYS use `format()` for string composition** - this is mandatory, not optional
+- Avoid redundant code: multiple `write()` calls, manual string concatenation, or temporary buffers
+- `format()` provides type-safe, efficient formatting with minimal code
+
+```cpp
+// ❌ PROHIBITED: Multiple write calls
+write_string("[");
+write_string(level_name);
+write_string("] ");
+write_string(message);
+write_string("\r\n");
+
+// ✅ REQUIRED: Use format()
+auto formatted = format("[{}] {}\r\n", level_name, message);
+write_text(span<const char>(formatted.data(), formatted.byte_length()));
+
+// ❌ PROHIBITED: Manual concatenation
+FixedString<64> str;
+str.append("[");
+str.append(level);
+str.append("] ");
+str.append(msg);
+
+// ✅ REQUIRED: Use format()
+auto str = format("[{}] {}", level, msg);
+```
 
 ## Usage Pattern
 
@@ -234,6 +263,10 @@ public:
 - `FixedBuffer<N>` - Stack byte buffer
 - `Vector3` - 3D vector for sensors
 - `PowerState` - Power/battery state enum
+- `Result<T, E>` - Rust-style result type for error handling
+- `std::optional<T>` - C++17 standard optional (use directly, no wrapper)
+- `span<T>` - Non-owning memory view (C++20 std::span backport)
+- `format()` - Type-safe string formatting
 
 ## Writing Examples
 

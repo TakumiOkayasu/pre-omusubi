@@ -12,7 +12,6 @@
 #include "core/format.hpp"
 #include "core/log_level.h"
 #include "core/logger.hpp"
-#include "core/optional.hpp"
 #include "core/result.hpp"
 #include "core/span.hpp"
 #include "core/static_string.hpp"

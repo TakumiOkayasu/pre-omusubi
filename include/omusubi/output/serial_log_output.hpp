@@ -2,6 +2,7 @@
 
 #include <omusubi/device/serial_context.h>
 
+#include <omusubi/core/format.hpp>
 #include <omusubi/core/logger.hpp>
 
 namespace omusubi {
@@ -33,20 +34,10 @@ public:
             return;
         }
 
-        // フォーマット: [LEVEL] message
-        write_string("[");
-        write_string(log_level_to_string(level));
-        write_string("] ");
-        write_string(message);
-        write_string("\r\n");
+        // format()を使用してログメッセージを整形
+        auto formatted = format("[{}] {}\r\n", log_level_to_string(level), message);
+        serial_->write_text(span<const char>(formatted.data(), formatted.byte_length()));
     }
-
-private:
-    /**
-     * @brief StringViewをシリアルに出力
-     * @param str 出力する文字列
-     */
-    void write_string(StringView str) { serial_->write_text(span<const char>(str.data(), str.byte_length())); }
 
     /**
      * @brief 出力をフラッシュ
