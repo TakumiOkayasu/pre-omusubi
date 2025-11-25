@@ -79,7 +79,7 @@ public:
 // ✅ 良い例: スタック割り当て
 void process_data() {
     FixedString<256> buffer;  // スタック
-    buffer.append("Hello"_sv);
+    buffer.append("Hello"sv);
     // 関数終了時に自動解放
 }
 
@@ -162,7 +162,7 @@ void process() {
     // 処理1
     {
         FixedString<256> temp;
-        temp.append("data"_sv);
+        temp.append("data"sv);
         // スコープ終了でスタック解放
     }
 
@@ -191,7 +191,7 @@ void process() {
 
 ```cpp
 // ✅ 自動的にインライン化される (ヘッダーオンリー)
-class StringView {
+class FixedString {
 public:
     constexpr uint32_t byte_length() const {
         return length_;  // 1命令に展開
@@ -397,7 +397,7 @@ class FixedString {
 // ❌ 悪い例: 毎回メソッドチェーンで取得
 void loop() {
     auto* serial = ctx.get_connectable_context()->get_serial_context(0);
-    serial->write("Hello"_sv);  // 毎回ポインタ取得
+    serial->write("Hello"sv);  // 毎回ポインタ取得
 }
 
 // ✅ 良い例: setup() で一度だけ取得
@@ -408,7 +408,7 @@ void setup() {
 }
 
 void loop() {
-    serial->write("Hello"_sv);  // キャッシュされたポインタを使用
+    serial->write("Hello"sv);  // キャッシュされたポインタを使用
 }
 ```
 
@@ -561,9 +561,9 @@ void benchmark() {
     }
 
     uint32_t elapsed = millis() - start;
-    serial->write("実行時間: "_sv);
+    serial->write("実行時間: "sv);
     // elapsed を出力
-    serial->write(" ms\n"_sv);
+    serial->write(" ms\n"sv);
 }
 ```
 
@@ -586,7 +586,7 @@ void estimate_stack_usage() {
 // M5Stack でのヒープ使用量
 void check_heap() {
     uint32_t free_heap = ESP.getFreeHeap();
-    serial->write("空きヒープ: "_sv);
+    serial->write("空きヒープ: "sv);
     // free_heap を出力
 }
 ```
@@ -623,10 +623,10 @@ FixedString<256> get_device_name() {
     return name;  // コピーコンストラクタ呼び出し
 }
 
-// ✅ 良い例: StringView で参照を返す
-StringView get_device_name() {
+// ✅ 良い例: std::string_view で参照を返す
+std::string_view get_device_name() {
     static constexpr char NAME[] = "Device";
-    return StringView(NAME);  // コピーなし
+    return std::string_view(NAME);  // コピーなし
 }
 ```
 
@@ -647,7 +647,7 @@ FixedString<64> device_name("M5Stack");  // 64バイトで十分
 void process() {
     for (uint32_t i = 0; i < 1000; ++i) {
         FixedString<256> temp;  // 毎回構築
-        temp.append("data"_sv);
+        temp.append("data"sv);
         use(temp);
     }
 }
@@ -657,7 +657,7 @@ void process() {
     FixedString<256> temp;
     for (uint32_t i = 0; i < 1000; ++i) {
         temp.clear();
-        temp.append("data"_sv);
+        temp.append("data"sv);
         use(temp);
     }
 }
@@ -668,13 +668,13 @@ void process() {
 ```cpp
 // ❌ 悪い例: 複数回の append
 FixedString<256> message;
-message.append("Error: "_sv);
-message.append("code="_sv);
-message.append("123"_sv);
+message.append("Error: "sv);
+message.append("code="sv);
+message.append("123"sv);
 
 // ✅ 良い例: まとめて append
 FixedString<256> message;
-message.append("Error: code=123"_sv);  // 1回のみ
+message.append("Error: code=123"sv);  // 1回のみ
 ```
 
 ### 5. 不要な仮想関数

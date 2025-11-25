@@ -29,7 +29,7 @@ public:
      * @param level ログレベル
      * @param message ログメッセージ
      */
-    void write(LogLevel level, StringView message) override {
+    void write(LogLevel level, std::string_view message) override {
         if (serial_ == nullptr) {
             return;
         }

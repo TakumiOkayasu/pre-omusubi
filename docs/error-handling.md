@@ -273,7 +273,7 @@ uint32_t value = read_sensor().value_or(0);
 // ✅ std::optional が適切な例
 
 // 検索結果（見つからない場合がある）
-std::optional<uint32_t> find_device_id(StringView name) {
+std::optional<uint32_t> find_device_id(std::string_view name) {
     for (uint32_t i = 0; i < device_count; i++) {
         if (devices[i].name == name) {
             return i;  // 暗黙的に std::optional<uint32_t> に変換
@@ -399,7 +399,7 @@ if (result.is_ok()) {
 // ✅ Result<T, E> が適切な例
 
 // ファイル読み込み（失敗理由が複数ある）
-Result<FixedBuffer<256>, Error> read_file(StringView path) {
+Result<FixedBuffer<256>, Error> read_file(std::string_view path) {
     if (!file_exists(path)) {
         return Result<FixedBuffer<256>, Error>::err(Error::FILE_NOT_FOUND);
     }
@@ -445,7 +445,7 @@ if (result.is_err()) {
 }
 
 // パース処理（構文エラーの詳細が必要）
-Result<uint32_t, Error> parse_number(StringView text) {
+Result<uint32_t, Error> parse_number(std::string_view text) {
     if (text.is_empty()) {
         return Result<uint32_t, Error>::err(Error::INVALID_PARAMETER);
     }

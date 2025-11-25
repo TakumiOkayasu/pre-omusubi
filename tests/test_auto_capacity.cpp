@@ -3,55 +3,56 @@
 #define DOCTEST_CONFIG_NO_EXCEPTIONS
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <omusubi/core/format.hpp>
+#include <string_view>
 
 #include "doctest.h"
 
 using namespace omusubi;
-using namespace omusubi::literals;
+using namespace std::literals;
 
 TEST_CASE("Auto Capacity - 基本機能") {
     SUBCASE("整数フォーマット") {
         auto str = format("Value: {}", 42);
-        CHECK_EQ(str.view(), "Value: 42"_sv);
+        CHECK_EQ(str.view(), "Value: 42"sv);
     }
 
     SUBCASE("文字列フォーマット") {
         auto str = format("Hello, {}!", "World");
-        CHECK_EQ(str.view(), "Hello, World!"_sv);
+        CHECK_EQ(str.view(), "Hello, World!"sv);
     }
 
     SUBCASE("複数引数フォーマット") {
         auto str = format("x={}, y={}", 10, 20);
-        CHECK_EQ(str.view(), "x=10, y=20"_sv);
+        CHECK_EQ(str.view(), "x=10, y=20"sv);
     }
 }
 
 TEST_CASE("Auto Capacity - 様々な型") {
     SUBCASE("Bool型") {
         auto str = format("Bool: {}", true);
-        CHECK_EQ(str.view(), "Bool: true"_sv);
+        CHECK_EQ(str.view(), "Bool: true"sv);
     }
 
     SUBCASE("Char型") {
         auto str = format("Char: {}", 'A');
-        CHECK_EQ(str.view(), "Char: A"_sv);
+        CHECK_EQ(str.view(), "Char: A"sv);
     }
 
     SUBCASE("混合型") {
         auto str = format("Int: {}, Bool: {}, Char: {}", 123, false, 'X');
-        CHECK_EQ(str.view(), "Int: 123, Bool: false, Char: X"_sv);
+        CHECK_EQ(str.view(), "Int: 123, Bool: false, Char: X"sv);
     }
 }
 
 TEST_CASE("Auto Capacity - format_to") {
     SUBCASE("整数フォーマット") {
         auto str = format_to("Value: {}", 42);
-        CHECK_EQ(str.view(), "Value: 42"_sv);
+        CHECK_EQ(str.view(), "Value: 42"sv);
     }
 
     SUBCASE("複数引数フォーマット") {
         auto str = format_to("Name: {}, Age: {}", "Alice", 25);
-        CHECK_EQ(str.view(), "Name: Alice, Age: 25"_sv);
+        CHECK_EQ(str.view(), "Name: Alice, Age: 25"sv);
     }
 }
 
@@ -128,7 +129,7 @@ TEST_CASE("Auto Capacity - 最大文字列長") {
         CHECK_EQ(detail::max_string_length<const char*>::value, 64U);
     }
 
-    SUBCASE("StringView") {
-        CHECK_EQ(detail::max_string_length<StringView>::value, 64U);
+    SUBCASE("std::string_view") {
+        CHECK_EQ(detail::max_string_length<std::string_view>::value, 64U);
     }
 }

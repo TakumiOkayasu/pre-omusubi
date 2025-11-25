@@ -41,7 +41,7 @@ TEST_CASE("FormatString - view/c_str/arg_count") {
     format_string<int, int> fs("x={}, y={}");
 
     auto view = fs.view();
-    CHECK_EQ(view.byte_length(), 10);
+    CHECK_EQ(view.size(), 10U);
     CHECK_EQ(view[0], 'x');
 
     auto c_str = fs.c_str();

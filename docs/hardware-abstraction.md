@@ -46,7 +46,7 @@
 // ✅ 良い例: スタック割り当て
 void process_data() {
     FixedString<64> buffer;
-    buffer.append("Hello"_sv);
+    buffer.append("Hello"sv);
 }
 
 // ❌ 悪い例: 動的メモリ確保
@@ -421,7 +421,7 @@ size_t M5StackBluetoothContext::write(span<const uint8_t> data) {
 void IRAM_ATTR button_isr() {
     auto* ctx = get_system_context();
     auto* serial = ctx->get_connectable_context()->get_serial_context(0);
-    serial->write("Button pressed\n"_sv);  // 割り込み内でI/O
+    serial->write("Button pressed\n"sv);  // 割り込み内でI/O
 }
 
 // ✅ 良い例: フラグのみ設定

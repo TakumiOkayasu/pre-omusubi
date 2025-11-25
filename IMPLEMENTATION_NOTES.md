@@ -7,7 +7,7 @@ Omusubiのformat実装は、C++23の`std::format`と`std::basic_format_string`�
 ### アーキテクチャ
 
 ```
-文字列リテラル/StringView
+文字列リテラル/std::string_view
          ↓
 basic_format_string<Args...> (型情報を保持)
          ↓
@@ -29,10 +29,10 @@ public:
     template <uint32_t N>
     constexpr basic_format_string(const char (&str)[N]) noexcept;
 
-    constexpr basic_format_string(StringView sv) noexcept;
+    constexpr basic_format_string(std::string_view sv) noexcept;
 
     constexpr const char* c_str() const noexcept;
-    constexpr StringView view() const noexcept;
+    constexpr std::string_view view() const noexcept;
     constexpr uint32_t length() const noexcept;
     static constexpr uint32_t arg_count() noexcept;
 };
@@ -63,17 +63,17 @@ constexpr FixedString<Capacity> format(
     const char (&format_str)[N],
     Args&&... args) noexcept;
 
-// 3. StringView版（実行時の動的文字列対応）
+// 3. std::string_view版（実行時の動的文字列対応）
 template <uint32_t Capacity, typename... Args>
 constexpr FixedString<Capacity> format(
-    StringView format_str,
+    std::string_view format_str,
     Args&&... args) noexcept;
 ```
 
 **設計原則**:
 - すべてのオーバーロードは最終的に`basic_format_string`版を呼び出す
 - 文字列リテラルは自動的に`basic_format_string<Args...>`に変換
-- StringViewは実行時の柔軟性のために提供
+- std::string_viewは実行時の柔軟性のために提供
 - const char*版は削除（文字列リテラル版と競合するため）
 
 #### format_to(...)
@@ -118,7 +118,7 @@ struct formatter {
 - 整数型: `int8_t`, `uint8_t`, `int16_t`, `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`
 - ブール型: `bool` (`"true"` / `"false"`)
 - 文字型: `char`
-- 文字列型: `const char*`, `StringView`
+- 文字列型: `const char*`, `std::string_view`
 
 ### 拡張方法
 
@@ -213,8 +213,8 @@ C++17のconstexpr関数は複雑なロジックを含められるが、例外は
 
 **対処**:
 - const char*オーバーロードを削除
-- 文字列リテラル版とStringView版のみ提供
-- 動的な文字列はStringView経由で使用
+- 文字列リテラル版とstd::string_view版のみ提供
+- 動的な文字列はstd::string_view経由で使用
 
 ## C++23 std::formatとの比較
 

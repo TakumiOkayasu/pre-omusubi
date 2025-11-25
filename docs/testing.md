@@ -37,8 +37,8 @@
 // 1. テストを先に書く
 TEST_CASE("FixedString - starts_with機能") {
     FixedString<32> s("Hello World");
-    CHECK(s.starts_with("Hello"_sv));
-    CHECK_FALSE(s.starts_with("World"_sv));
+    CHECK(s.starts_with("Hello"sv));
+    CHECK_FALSE(s.starts_with("World"sv));
 }
 
 // 2. 実装を追加
@@ -53,7 +53,7 @@ TEST_CASE("FixedString - starts_with機能") {
 ### 3. テスト範囲
 
 **単体テスト対象:**
-- Core types (`span<T>`, `StringView`, `FixedString<N>`, `FixedBuffer<N>`, `Vector3`)
+- Core types (`span<T>`, `std::string_view`, `FixedString<N>`, `FixedBuffer<N>`, `Vector3`)
 - Utility functions
 - Interface contracts
 
@@ -157,7 +157,7 @@ TEST_CASE("FixedString - 追加操作") {
     FixedString<32> s;
 
     // Act - 操作実行
-    bool success = s.append("Hello"_sv);
+    bool success = s.append("Hello"sv);
 
     // Assert - 結果検証
     CHECK(success);
@@ -211,7 +211,7 @@ TEST_CASE("FixedString - 容量管理") {
 ```
 tests/
 ├── test_span.cpp           # span<T>のテスト
-├── test_string_view.cpp    # StringViewのテスト
+├── test_string_view.cpp    # std::string_viewのテスト
 ├── test_fixed_string.cpp   # FixedString<N>のテスト
 ├── test_fixed_buffer.cpp   # FixedBuffer<N>のテスト
 ├── test_vector3.cpp        # Vector3のテスト
@@ -251,7 +251,7 @@ TEST_CASE("everything")
 TEST_CASE("FixedString - 初期化") {
     SUBCASE("デフォルトコンストラクタ") { }
     SUBCASE("C文字列からの構築") { }
-    SUBCASE("StringViewからの構築") { }
+    SUBCASE("std::string_viewからの構築") { }
 }
 ```
 
@@ -272,7 +272,7 @@ TEST_CASE("FixedString - 初期化") {
 
 // 名前空間
 using namespace omusubi;
-using namespace omusubi::literals;
+using namespace std::literals;
 
 // ========================================
 // テストケース
@@ -294,21 +294,21 @@ TEST_CASE("FixedString - 基本機能") {
 TEST_CASE("FixedString - 追加操作") {
     FixedString<32> s;
 
-    SUBCASE("StringView追加") {
-        CHECK(s.append("Hello"_sv));
+    SUBCASE("std::string_view追加") {
+        CHECK(s.append("Hello"sv));
         CHECK_EQ(s.byte_length(), 5U);
     }
 
     SUBCASE("連続追加") {
-        CHECK(s.append("Hello"_sv));
-        CHECK(s.append(" World"_sv));
+        CHECK(s.append("Hello"sv));
+        CHECK(s.append(" World"sv));
         CHECK_EQ(s.byte_length(), 11U);
     }
 }
 
 TEST_CASE("FixedString - UTF-8処理") {
     FixedString<64> s;
-    s.append("こんにちは"_sv);
+    s.append("こんにちは"sv);
 
     CHECK_EQ(s.byte_length(), 15U);    // 5文字 × 3バイト
     CHECK_EQ(s.char_length(), 5U);     // 5文字
@@ -391,8 +391,8 @@ CHECK(angle == doctest::Approx(3.14159F).epsilon(0.00001F));
 ### 文字列比較
 
 ```cpp
-// StringViewとの比較
-CHECK_EQ(s.view(), "Hello"_sv);
+// std::string_viewとの比較
+CHECK_EQ(s.view(), "Hello"sv);
 
 // C文字列との比較
 CHECK(strcmp(s.c_str(), "Hello") == 0);
@@ -440,7 +440,7 @@ CHECK_FALSE(error_occurred);
 ```cpp
 TEST_CASE("FixedString - 正常系") {
     FixedString<32> s;
-    CHECK(s.append("Hello"_sv));
+    CHECK(s.append("Hello"sv));
     CHECK_EQ(s.byte_length(), 5U);
 }
 ```
@@ -560,15 +560,15 @@ public:
     }
 
     // テスト用ヘルパー
-    void set_read_data(StringView data) {
+    void set_read_data(std::string_view data) {
         read_buffer_.clear();
         for (char c : data) {
             read_buffer_.append(static_cast<uint8_t>(c));
         }
     }
 
-    [[nodiscard]] StringView get_written_data() const {
-        return StringView(
+    [[nodiscard]] std::string_view get_written_data() const {
+        return std::string_view(
             reinterpret_cast<const char*>(write_buffer_.data()),
             write_buffer_.size()
         );
@@ -581,7 +581,7 @@ public:
 ```cpp
 TEST_CASE("Serial - モックを使ったテスト") {
     MockSerialContext mock_serial;
-    mock_serial.set_read_data("Hello"_sv);
+    mock_serial.set_read_data("Hello"sv);
 
     uint8_t buffer[10];
     size_t bytes_read = mock_serial.read(span<uint8_t>(buffer, 10));
@@ -663,13 +663,13 @@ make tests
 #include <omusubi/omusubi.h>
 
 using namespace omusubi;
-using namespace omusubi::literals;
+using namespace std::literals;
 
 SystemContext& ctx = get_system_context();
 SerialContext* serial = nullptr;
 
 void test_serial_loopback() {
-    serial->write_text("Hello"_sv);
+    serial->write_text("Hello"sv);
     ctx.delay(100);
 
     uint8_t buffer[10];
@@ -677,9 +677,9 @@ void test_serial_loopback() {
 
     // 結果をシリアル出力で確認
     if (bytes == 5) {
-        serial->write_text("[PASS] Serial loopback\r\n"_sv);
+        serial->write_text("[PASS] Serial loopback\r\n"sv);
     } else {
-        serial->write_text("[FAIL] Serial loopback\r\n"_sv);
+        serial->write_text("[FAIL] Serial loopback\r\n"sv);
     }
 }
 
@@ -724,7 +724,7 @@ pio device monitor
 // 良い例: 1つの機能を検証
 TEST_CASE("append - 成功") {
     FixedString<32> s;
-    CHECK(s.append("Hello"_sv));
+    CHECK(s.append("Hello"sv));
 }
 
 TEST_CASE("append - 容量超過") {
@@ -735,7 +735,7 @@ TEST_CASE("append - 容量超過") {
 // 悪い例: 複数の機能を混在
 TEST_CASE("append") {
     FixedString<32> s1;
-    CHECK(s1.append("Hello"_sv));
+    CHECK(s1.append("Hello"sv));
 
     FixedString<10> s2("1234567890");
     CHECK_FALSE(s2.append("X"));
@@ -755,7 +755,7 @@ TEST_CASE("clear") {
 
 TEST_CASE("append") {
     FixedString<32> s;  // 新しいオブジェクト
-    CHECK(s.append("World"_sv));
+    CHECK(s.append("World"sv));
 }
 
 // 悪い例: グローバル変数でテスト間に依存
@@ -805,7 +805,7 @@ TEST_CASE("example") {
     FixedString<32> s;
 
     // Act
-    auto result = s.append("Hello"_sv);
+    auto result = s.append("Hello"sv);
 
     // Assert
     CHECK(result);

@@ -2,26 +2,36 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <omusubi/core/string_base.hpp>
+#include <string_view>
 
 namespace omusubi::utf8 {
 
+/**
+ * @brief UTF-8文字の先頭バイトからバイト長を取得
+ */
 constexpr uint8_t get_char_byte_length(uint8_t first_byte) noexcept {
     if ((first_byte & 0x80) == 0x00) {
         return 1;
     }
+
     if ((first_byte & 0xE0) == 0xC0) {
         return 2;
     }
+
     if ((first_byte & 0xF0) == 0xE0) {
         return 3;
     }
+
     if ((first_byte & 0xF8) == 0xF0) {
         return 4;
     }
+
     return 1;
 }
 
+/**
+ * @brief UTF-8文字列の文字数を取得
+ */
 constexpr uint32_t count_chars(const char* str, uint32_t byte_length) noexcept {
     uint32_t char_count = 0;
     uint32_t i = 0;
@@ -35,6 +45,9 @@ constexpr uint32_t count_chars(const char* str, uint32_t byte_length) noexcept {
     return char_count;
 }
 
+/**
+ * @brief UTF-8文字インデックスからバイト位置を取得
+ */
 constexpr uint32_t get_char_position(const char* str, uint32_t byte_length, uint32_t char_index) noexcept {
     uint32_t current_char = 0;
     uint32_t i = 0;
@@ -52,141 +65,43 @@ constexpr uint32_t get_char_position(const char* str, uint32_t byte_length, uint
 
 namespace omusubi {
 
-class StringView : public String<StringView> {
-public:
-    /**
-     * @brief デフォルトコンストラクタ（空文字列）
-     */
-    constexpr StringView() noexcept : data_(""), byte_length_(0) {}
-
-    /**
-     * @brief C文字列リテラルから構築（コンパイル時長さ計算）
-     */
-    template <uint32_t N>
-    constexpr StringView(const char (&str)[N]) noexcept : data_(str), byte_length_(N - 1) {} // null終端を除く
-
-    /**
-     * @brief ポインタと長さから構築
-     */
-    constexpr StringView(const char* str, uint32_t len) noexcept : data_(str), byte_length_(len) {}
-
-    /**
-     * @brief C文字列から構築（実行時長さ計算）
-     */
-    static constexpr StringView from_c_string(const char* str) noexcept {
-        if (str == nullptr) {
-            return StringView {};
-        }
-
-        uint32_t len = 0;
-
-        while (str[len] != 0U) {
-            ++len;
-        }
-
-        return {str, len};
-    }
-
-    /**
-     * @brief データへのポインタを取得
-     */
-    constexpr const char* data() const noexcept { return data_; }
-
-    /**
-     * @brief バイト長を取得
-     */
-    constexpr uint32_t byte_length() const noexcept { return byte_length_; }
-
-    /**
-     * @brief バイト単位のアクセス
-     */
-    constexpr char operator[](uint32_t index) const noexcept { return (index < byte_length_) ? data_[index] : '\0'; }
-
-    /**
-     * @brief 部分文字列を取得
-     */
-    constexpr StringView substring(uint32_t start, uint32_t length) const noexcept {
-        if (start >= byte_length_) {
-            return StringView {};
-        }
-
-        uint32_t actual_length = length;
-
-        if (start + length > byte_length_) {
-            actual_length = byte_length_ - start;
-        }
-
-        return {data_ + start, actual_length};
-    }
-
-    bool operator==(StringView other) const noexcept { return String<StringView>::equals(other); }
-
-    bool operator!=(StringView other) const noexcept { return !String<StringView>::equals(other); }
-
-    /**
-     * @brief 指定された接頭辞で始まるか判定
-     */
-    constexpr bool starts_with(StringView prefix) const noexcept {
-        if (prefix.byte_length_ > byte_length_) {
-            return false;
-        }
-
-        return substring(0, prefix.byte_length_).equals(prefix);
-    }
-
-    /**
-     * @brief 指定された接尾辞で終わるか判定
-     */
-    constexpr bool ends_with(StringView suffix) const noexcept {
-        if (suffix.byte_length_ > byte_length_) {
-            return false;
-        }
-
-        const uint32_t start = byte_length_ - suffix.byte_length_;
-        return substring(start, suffix.byte_length_).equals(suffix);
-    }
-
-    /**
-     * @brief 部分文字列を含むか判定
-     */
-    constexpr bool contains(StringView needle) const noexcept {
-        if (needle.byte_length_ > byte_length_) {
-            return false;
-        }
-
-        for (uint32_t i = 0; i <= byte_length_ - needle.byte_length_; ++i) {
-            if (substring(i, needle.byte_length_).equals(needle)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @brief イテレータ（開始）
-     */
-    constexpr const char* begin() const noexcept { return data_; }
-
-    /**
-     * @brief イテレータ（終了）
-     */
-    constexpr const char* end() const noexcept { return data_ + byte_length_; }
-
-private:
-    const char* data_;
-    uint32_t byte_length_;
-};
-
-} // namespace omusubi
-
-namespace omusubi::literals {
-
 /**
- * @brief 文字列リテラル演算子
+ * @brief std::string_view の UTF-8 文字数を取得
  */
-constexpr StringView operator""_sv(const char* str, size_t len) noexcept {
-    return {str, static_cast<uint32_t>(len)};
+[[nodiscard]] constexpr uint32_t char_length(std::string_view sv) noexcept {
+    return utf8::count_chars(sv.data(), static_cast<uint32_t>(sv.size()));
 }
 
-} // namespace omusubi::literals
+/**
+ * @brief std::string_view の UTF-8 文字インデックスからバイト位置を取得
+ */
+[[nodiscard]] constexpr uint32_t get_char_position(std::string_view sv, uint32_t char_index) noexcept {
+    return utf8::get_char_position(sv.data(), static_cast<uint32_t>(sv.size()), char_index);
+}
+
+/**
+ * @brief std::string_view が空かどうか判定
+ */
+[[nodiscard]] constexpr bool is_empty(std::string_view sv) noexcept {
+    return sv.empty();
+}
+
+/**
+ * @brief 2つの std::string_view が等しいか判定
+ */
+[[nodiscard]] constexpr bool equals(std::string_view a, std::string_view b) noexcept {
+    return a == b;
+}
+
+/**
+ * @brief C文字列から std::string_view を構築
+ */
+[[nodiscard]] inline std::string_view from_c_string(const char* str) noexcept {
+    if (str == nullptr) {
+        return std::string_view {};
+    }
+
+    return std::string_view {str};
+}
+
+} // namespace omusubi

@@ -23,7 +23,7 @@ private:
 public:
     MockLogOutput() : last_message_(), last_level_(LogLevel::DEBUG), write_count_(0), flush_count_(0) {}
 
-    void write(LogLevel level, StringView message) override {
+    void write(LogLevel level, std::string_view message) override {
         last_level_ = level;
         last_message_.clear();
         last_message_.append(message);
@@ -33,7 +33,7 @@ public:
     void flush() override { flush_count_++; }
 
     // テスト用アクセッサ
-    StringView get_last_message() const { return last_message_.view(); }
+    std::string_view get_last_message() const { return last_message_.view(); }
 
     LogLevel get_last_level() const { return last_level_; }
 
@@ -57,13 +57,13 @@ TEST_CASE("Logger - 基本的なログ出力") {
     MockLogOutput output;
     Logger logger(&output, LogLevel::DEBUG);
 
-    logger.info(StringView("Hello", 5));
+    logger.info(std::string_view("Hello", 5));
 
     CHECK_EQ(output.get_write_count(), 1U);
     CHECK_EQ(static_cast<uint8_t>(output.get_last_level()), static_cast<uint8_t>(LogLevel::INFO));
 
     auto msg = output.get_last_message();
-    CHECK_EQ(msg.byte_length(), 5U);
+    CHECK_EQ(msg.size(), 5U);
     bool msg_equal = (msg.data()[0] == 'H' && msg.data()[1] == 'e' && msg.data()[2] == 'l' && msg.data()[3] == 'l' && msg.data()[4] == 'o');
     CHECK(msg_equal);
 }
@@ -77,8 +77,8 @@ TEST_CASE("Logger - ログレベルフィルタリング") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::WARNING);
 
-        logger.debug(StringView("debug", 5));
-        logger.info(StringView("info", 4));
+        logger.debug(std::string_view("debug", 5));
+        logger.info(std::string_view("info", 4));
 
         CHECK_EQ(output.get_write_count(), 0U);
     }
@@ -87,9 +87,9 @@ TEST_CASE("Logger - ログレベルフィルタリング") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::WARNING);
 
-        logger.warning(StringView("warn", 4));
-        logger.error(StringView("error", 5));
-        logger.critical(StringView("crit", 4));
+        logger.warning(std::string_view("warn", 4));
+        logger.error(std::string_view("error", 5));
+        logger.critical(std::string_view("crit", 4));
 
         CHECK_EQ(output.get_write_count(), 3U);
     }
@@ -104,7 +104,7 @@ TEST_CASE("Logger - 各ログレベルメソッド") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::DEBUG);
 
-        logger.debug(StringView("debug message", 13));
+        logger.debug(std::string_view("debug message", 13));
 
         CHECK_EQ(static_cast<uint8_t>(output.get_last_level()), static_cast<uint8_t>(LogLevel::DEBUG));
         CHECK_EQ(output.get_write_count(), 1U);
@@ -114,7 +114,7 @@ TEST_CASE("Logger - 各ログレベルメソッド") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::DEBUG);
 
-        logger.info(StringView("info message", 12));
+        logger.info(std::string_view("info message", 12));
 
         CHECK_EQ(static_cast<uint8_t>(output.get_last_level()), static_cast<uint8_t>(LogLevel::INFO));
         CHECK_EQ(output.get_write_count(), 1U);
@@ -124,7 +124,7 @@ TEST_CASE("Logger - 各ログレベルメソッド") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::DEBUG);
 
-        logger.warning(StringView("warning message", 15));
+        logger.warning(std::string_view("warning message", 15));
 
         CHECK_EQ(static_cast<uint8_t>(output.get_last_level()), static_cast<uint8_t>(LogLevel::WARNING));
         CHECK_EQ(output.get_write_count(), 1U);
@@ -134,7 +134,7 @@ TEST_CASE("Logger - 各ログレベルメソッド") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::DEBUG);
 
-        logger.error(StringView("error message", 13));
+        logger.error(std::string_view("error message", 13));
 
         CHECK_EQ(static_cast<uint8_t>(output.get_last_level()), static_cast<uint8_t>(LogLevel::ERROR));
         CHECK_EQ(output.get_write_count(), 1U);
@@ -144,7 +144,7 @@ TEST_CASE("Logger - 各ログレベルメソッド") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::DEBUG);
 
-        logger.critical(StringView("critical message", 16));
+        logger.critical(std::string_view("critical message", 16));
 
         CHECK_EQ(static_cast<uint8_t>(output.get_last_level()), static_cast<uint8_t>(LogLevel::CRITICAL));
         CHECK_EQ(output.get_write_count(), 1U);
@@ -164,10 +164,10 @@ TEST_CASE("Logger - 最小ログレベル変更") {
     logger.set_min_level(LogLevel::ERROR);
     CHECK_EQ(static_cast<uint8_t>(logger.get_min_level()), static_cast<uint8_t>(LogLevel::ERROR));
 
-    logger.info(StringView("info", 4));
+    logger.info(std::string_view("info", 4));
     CHECK_EQ(output.get_write_count(), 0U);
 
-    logger.error(StringView("error", 5));
+    logger.error(std::string_view("error", 5));
     CHECK_EQ(output.get_write_count(), 1U);
 }
 
@@ -178,7 +178,7 @@ TEST_CASE("Logger - 最小ログレベル変更") {
 TEST_CASE("Logger - nullptr出力先") {
     Logger logger(nullptr, LogLevel::DEBUG);
 
-    logger.info(StringView("test", 4));
+    logger.info(std::string_view("test", 4));
     logger.flush();
 
     CHECK(true);
@@ -207,35 +207,35 @@ TEST_CASE("Logger - flush() メソッド") {
 TEST_CASE("Logger - log_level_to_string()") {
     SUBCASE("DEBUG") {
         auto str = log_level_to_string(LogLevel::DEBUG);
-        CHECK_EQ(str.byte_length(), 5U);
+        CHECK_EQ(str.size(), 5U);
         bool equal = (str.data()[0] == 'D' && str.data()[1] == 'E' && str.data()[2] == 'B' && str.data()[3] == 'U' && str.data()[4] == 'G');
         CHECK(equal);
     }
 
     SUBCASE("INFO") {
         auto str = log_level_to_string(LogLevel::INFO);
-        CHECK_EQ(str.byte_length(), 4U);
+        CHECK_EQ(str.size(), 4U);
         bool equal = (str.data()[0] == 'I' && str.data()[1] == 'N' && str.data()[2] == 'F' && str.data()[3] == 'O');
         CHECK(equal);
     }
 
     SUBCASE("WARNING") {
         auto str = log_level_to_string(LogLevel::WARNING);
-        CHECK_EQ(str.byte_length(), 4U);
+        CHECK_EQ(str.size(), 4U);
         bool equal = (str.data()[0] == 'W' && str.data()[1] == 'A' && str.data()[2] == 'R' && str.data()[3] == 'N');
         CHECK(equal);
     }
 
     SUBCASE("ERROR") {
         auto str = log_level_to_string(LogLevel::ERROR);
-        CHECK_EQ(str.byte_length(), 5U);
+        CHECK_EQ(str.size(), 5U);
         bool equal = (str.data()[0] == 'E' && str.data()[1] == 'R' && str.data()[2] == 'R' && str.data()[3] == 'O' && str.data()[4] == 'R');
         CHECK(equal);
     }
 
     SUBCASE("CRITICAL") {
         auto str = log_level_to_string(LogLevel::CRITICAL);
-        CHECK_EQ(str.byte_length(), 4U);
+        CHECK_EQ(str.size(), 4U);
         bool equal = (str.data()[0] == 'C' && str.data()[1] == 'R' && str.data()[2] == 'I' && str.data()[3] == 'T');
         CHECK(equal);
     }
@@ -250,7 +250,7 @@ TEST_CASE("Logger - log_at<Level>() テンプレート関数") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::DEBUG);
 
-        log_at<LogLevel::INFO>(logger, StringView("template log", 12));
+        log_at<LogLevel::INFO>(logger, std::string_view("template log", 12));
 
         CHECK_EQ(output.get_write_count(), 1U);
         CHECK_EQ(static_cast<uint8_t>(output.get_last_level()), static_cast<uint8_t>(LogLevel::INFO));
@@ -260,7 +260,7 @@ TEST_CASE("Logger - log_at<Level>() テンプレート関数") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::DEBUG);
 
-        log_at<LogLevel::ERROR>(logger, StringView("error log", 9));
+        log_at<LogLevel::ERROR>(logger, std::string_view("error log", 9));
 
         CHECK_EQ(output.get_write_count(), 1U);
         CHECK_EQ(static_cast<uint8_t>(output.get_last_level()), static_cast<uint8_t>(LogLevel::ERROR));
@@ -270,7 +270,7 @@ TEST_CASE("Logger - log_at<Level>() テンプレート関数") {
         MockLogOutput output;
         Logger logger(&output, LogLevel::DEBUG);
 
-        log_at<LogLevel::DEBUG>(logger, StringView("debug log", 9));
+        log_at<LogLevel::DEBUG>(logger, std::string_view("debug log", 9));
 
 #ifdef NDEBUG
         CHECK_EQ(output.get_write_count(), 0U);

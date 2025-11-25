@@ -36,7 +36,7 @@
 - `Optional<T>` - std::optional互換実装
 - `Result<T, E>` - Rust風Result型
 - `Logger` - 軽量ログシステム
-- `StringView` - 文字列参照（UTF-8対応）
+- `std::string_view` - 文字列参照（UTF-8対応）
 - `FixedString<N>` - 固定長文字列
 - `FixedBuffer<N>` - 固定長バッファ
 - `span<T>` - メモリ範囲
@@ -68,7 +68,7 @@ Omusubiは以下の2層構造により依存関係を分離しています：
 ```
 ┌─────────────────────────────────────────┐
 │ Omusubiコア (外部依存なし)                │
-│ - Optional, Result, Logger, StringView  │
+│ - Optional, Result, Logger              │
 │ - インターフェース定義                    │
 └─────────────────────────────────────────┘
                   ↓
@@ -257,7 +257,7 @@ and use only standard C++17 features.
 | **Omusubiコア** | なし | - | ✅ 完全自由 | 不要 |
 | **Logger** | なし | - | ✅ 完全自由 | 不要 |
 | **Optional/Result** | なし | - | ✅ 完全自由 | 不要 |
-| **StringView** | なし | - | ✅ 完全自由 | 不要 |
+| **std::string_view** | なし | - | ✅ 完全自由 | 不要 |
 | **M5Stack実装** | M5Stack Lib | MIT | ✅ 可能 | 必要 |
 | **ESP32 Core** | ESP32 Arduino | Apache 2.0 | ✅ 可能 | 必要 |
 | **BLE** | ESP32 BLE | Apache 2.0 | ✅ 可能 | 必要 |

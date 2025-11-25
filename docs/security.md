@@ -77,8 +77,8 @@ void set_device_name(const char* name) {
 }
 
 // ✅ 良い例: 長さ制限
-bool set_device_name(StringView name) {
-    if (name.byte_length() > MAX_NAME_LENGTH) {
+bool set_device_name(std::string_view name) {
+    if (name.size() > MAX_NAME_LENGTH) {
         return false;  // 長すぎる名前を拒否
     }
 
@@ -126,15 +126,15 @@ void set_port(SerialPort port) {
 
 ```cpp
 // ❌ 悪い例: パストラバーサル脆弱性
-void load_config(StringView filename) {
+void load_config(std::string_view filename) {
     // filename = "../../etc/passwd" など危険
     open_file(filename);
 }
 
 // ✅ 良い例: パス正規化と検証
-bool load_config(StringView filename) {
+bool load_config(std::string_view filename) {
     // パストラバーサル文字列を拒否
-    if (filename.contains(".."_sv) || filename.contains("/"_sv)) {
+    if (filename.contains(".."sv) || filename.contains("/"sv)) {
         return false;
     }
 
@@ -202,7 +202,7 @@ private:
     uint32_t length_ = 0;
 
 public:
-    bool append(StringView str) {
+    bool append(std::string_view str) {
         if (length_ + str.byte_length() > N) {
             return false;  // 容量不足
         }
@@ -250,10 +250,10 @@ bool calculate_total(uint32_t a, uint32_t b, uint32_t& result) {
 
 ```cpp
 // ❌ 悪い例: 平文通信
-wifi->connect_to("MyNetwork"_sv, ""_sv);  // パスワードなし
+wifi->connect_to("MyNetwork"sv, ""sv);  // パスワードなし
 
 // ✅ 良い例: WPA2 暗号化
-wifi->connect_to("MyNetwork"_sv, "SecurePassword123"_sv);
+wifi->connect_to("MyNetwork"sv, "SecurePassword123"sv);
 ```
 
 ### 2. Bluetooth セキュリティ
@@ -267,7 +267,7 @@ private:
     bool paired_ = false;
 
 public:
-    bool pair(StringView pin) {
+    bool pair(std::string_view pin) {
         // PIN コード検証
         if (pin != EXPECTED_PIN) {
             return false;
@@ -299,7 +299,7 @@ private:
     bool authenticated_ = false;
 
 public:
-    bool authenticate(StringView password) {
+    bool authenticate(std::string_view password) {
         if (password == ADMIN_PASSWORD) {
             authenticated_ = true;
             return true;
@@ -307,7 +307,7 @@ public:
         return false;
     }
 
-    bool execute_command(StringView command) {
+    bool execute_command(std::string_view command) {
         // 危険なコマンドは認証必須
         if (is_dangerous_command(command)) {
             if (!authenticated_) {
@@ -358,7 +358,7 @@ public:
 // ❌ 悪い例: 平文パスワード
 const char* PASSWORD = "admin123";  // ハードコード
 
-bool authenticate(StringView password) {
+bool authenticate(std::string_view password) {
     return password == PASSWORD;  // 平文比較
 }
 
@@ -368,7 +368,7 @@ const uint8_t PASSWORD_HASH[32] = {
     0x8c, 0x69, 0x76, 0xe5, /* ... */
 };
 
-bool authenticate(StringView password) {
+bool authenticate(std::string_view password) {
     uint8_t hash[32];
     sha256(password, hash);
 
@@ -439,7 +439,7 @@ public:
 };
 
 // 使用例
-bool authenticate(StringView password) {
+bool authenticate(std::string_view password) {
     if (rate_limiter.is_locked()) {
         return false;  // ロックアウト中
     }
@@ -492,7 +492,7 @@ void secure_memzero(void* ptr, size_t len) {
     }
 }
 
-void process_password(StringView password) {
+void process_password(std::string_view password) {
     // パスワード処理
     uint8_t hash[32];
     sha256(password, hash);
@@ -508,15 +508,15 @@ void process_password(StringView password) {
 
 ```cpp
 // ❌ 悪い例: パスワードをログ出力
-serial->write("接続中: SSID="_sv);
+serial->write("接続中: SSID="sv);
 serial->write(ssid);
-serial->write(", パスワード="_sv);
+serial->write(", パスワード="sv);
 serial->write(password);  // 機密情報が漏洩
 
 // ✅ 良い例: 機密情報をマスク
-serial->write("接続中: SSID="_sv);
+serial->write("接続中: SSID="sv);
 serial->write(ssid);
-serial->write(", パスワード=****"_sv);  // マスク
+serial->write(", パスワード=****"sv);  // マスク
 ```
 
 ---
@@ -530,7 +530,7 @@ serial->write(", パスワード=****"_sv);  // マスク
 **A01: アクセス制御の不備**
 ```cpp
 // ✅ アクセス制御
-bool execute_admin_command(StringView command) {
+bool execute_admin_command(std::string_view command) {
     if (!is_admin_authenticated()) {
         return false;  // 管理者のみ実行可能
     }
@@ -551,7 +551,7 @@ bool send_sensitive_data(span<const uint8_t> data) {
 **A03: インジェクション**
 ```cpp
 // ✅ 入力検証とサニタイズ
-bool execute_sql_query(StringView query) {
+bool execute_sql_query(std::string_view query) {
     // SQL インジェクション対策: プレースホルダ使用
     // または入力を厳密に検証
     if (!is_safe_query(query)) {
@@ -596,7 +596,7 @@ bool process(SerialContext* serial) {
         return false;
     }
 
-    serial->write("data"_sv);
+    serial->write("data"sv);
     return true;
 }
 ```

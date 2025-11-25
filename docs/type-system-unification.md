@@ -76,7 +76,7 @@ FixedString<70000> str;  // オーバーフローして4464になる！
    - 標準ライブラリのコンテナとの連携
 
 3. **文字列リテラル演算子**
-   - C++標準では`operator""_sv(const char*, size_t)`が必須
+   - C++標準では`operator""sv(const char*, size_t)`が必須
 
 ## 型の使い分けルール
 
@@ -87,7 +87,7 @@ FixedString<70000> str;  // オーバーフローして4464になる！
 | **`FixedString`, `FixedBuffer`, `StaticString`の内部処理** | `uint32_t` | 組み込みシステムでの予測可能な動作 |
 | **I/O操作の戻り値（`read()`, `write()`, `available()`）** | `size_t` | C++標準ライブラリとの互換性 |
 | **`span<T>`の操作（`size()`, `operator[]`）** | `size_t` | C++20 `std::span`互換性、標準コンテナとの連携 |
-| **文字列リテラル演算子（`operator""_sv`）** | `size_t` | C++標準要求 |
+| **文字列リテラル演算子（`operator""sv`）** | `size_t` | C++標準要求 |
 
 ## 実施した修正
 
@@ -144,12 +144,12 @@ auto str = static_string("Hello");
 
 **削除前:**
 ```cpp
-constexpr span<const char> to_span(StringView sv) noexcept {
-    return {sv.data(), sv.byte_length()};
+constexpr span<const char> to_span(std::string_view sv) noexcept {
+    return {sv.data(), sv.size()};
 }
 
-constexpr StringView to_string_view(span<const char> s) noexcept {
-    return {s.data(), static_cast<uint32_t>(s.size())};  // ← 不要なキャスト隠蔽
+constexpr std::string_view to_string_view(span<const char> s) noexcept {
+    return {s.data(), s.size()};
 }
 ```
 
@@ -160,11 +160,11 @@ constexpr StringView to_string_view(span<const char> s) noexcept {
 
 **代替方法:**
 ```cpp
-// span → StringView（明示的なキャストで意図を明確に）
-StringView sv{s.data(), static_cast<uint32_t>(s.size())};
+// span → std::string_view（直接変換可能）
+std::string_view sv{s.data(), s.size()};
 
-// StringView → span（そのまま渡せる）
-span<const char> sp{sv.data(), sv.byte_length()};
+// std::string_view → span（そのまま渡せる）
+span<const char> sp{sv.data(), sv.size()};
 ```
 
 ---
@@ -244,19 +244,19 @@ void from_span(span<const uint8_t> s) noexcept {
 2. **`to_span()`** - 不要な変換関数
    ```cpp
    // ❌ 削除
-   constexpr span<const char> to_span(StringView sv) noexcept;
+   constexpr span<const char> to_span(std::string_view sv) noexcept;
 
    // ✅ 代わりにこれを使用
-   span<const char> s{sv.data(), sv.byte_length()};
+   span<const char> s{sv.data(), sv.size()};
    ```
 
 3. **`to_string_view()`** - 不要な変換関数
    ```cpp
    // ❌ 削除
-   constexpr StringView to_string_view(span<const char> s) noexcept;
+   constexpr std::string_view to_string_view(span<const char> s) noexcept;
 
    // ✅ 代わりにこれを使用
-   StringView sv{s.data(), static_cast<uint32_t>(s.size())};
+   std::string_view sv{s.data(), s.size()};
    ```
 
 ---
@@ -290,8 +290,8 @@ void from_span(span<const uint8_t> s) noexcept {
 
 ✅ **不要なラッパー関数を削除**
 - `make_static_string()` → 削除
-- `to_span()` → 削除
-- `to_string_view()` → 削除
+- `to_span()` → 削除（std::string_viewから直接変換可能）
+- `to_string_view()` → 削除（spanから直接変換可能）
 
 ✅ **コードの品質向上**
 - シンプルで直感的なAPI

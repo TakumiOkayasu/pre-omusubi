@@ -262,7 +262,7 @@ void process(FixedString<256> str);
 
 // ✅ ゼロコピー
 void process(span<const char> str);
-void process(StringView str);
+void process(std::string_view str);
 ```
 
 **5. 不要なコメントを書かない**
@@ -381,7 +381,7 @@ gh pr create --title "feat: Add temperature sensor support" --body "..."
 
 ### Scope（オプション）
 
-- `core`: コア機能（StringView, span等）
+- `core`: コア機能（std::string_view, span等）
 - `interface`: インターフェース層
 - `context`: Context層
 - `device`: Device層

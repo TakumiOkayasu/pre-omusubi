@@ -185,12 +185,12 @@ class TextReadable : public ByteReadable {
 ```cpp
 // ✅ 良い例: 抽象型を返す
 class Scannable {
-    virtual StringView get_found_name(uint8_t index) const = 0;
-    //      ↑ StringView は抽象型
+    virtual std::string_view get_found_name(uint8_t index) const = 0;
+    //      ↑ std::string_view は抽象型
 };
 
 class SystemInfoContext {
-    virtual StringView get_device_name() const = 0;
+    virtual std::string_view get_device_name() const = 0;
     //      ↑ 実装詳細(FixedString<N>)を隠蔽
 };
 
@@ -215,7 +215,7 @@ Omusubiのインターフェース設計はJava標準ライブラリのパター
 | `TextWritable` | `Writer` | テキストストリーム書き込み |
 | `Scannable` | `Scanner` | デバイス/ネットワークスキャン |
 | `Connectable` | - | 接続管理(組み込み特有) |
-| `StringView` | `CharSequence` | 文字列の抽象参照 |
+| `std::string_view` | `CharSequence` | 文字列の抽象参照 |
 
 **設計思想の借用:**
 - Java: 完全な抽象化(仮想関数テーブルのオーバーヘッドは許容)
@@ -359,7 +359,7 @@ class LEDContext : public Switchable, public PWMControllable {
 ```cpp
 // ✅ 良い例: 抽象型を返す
 class SystemInfoContext {
-    virtual StringView get_device_name() const = 0;
+    virtual std::string_view get_device_name() const = 0;
     //      ↑ 実装がFixedString<N>であることを隠蔽
 };
 
@@ -368,8 +368,8 @@ class M5StackSystemInfoContext : public SystemInfoContext {
 private:
     FixedString<32> device_name_;
 public:
-    StringView get_device_name() const override {
-        return device_name_.view();  // FixedString → StringView 変換
+    std::string_view get_device_name() const override {
+        return device_name_.view();  // FixedString → std::string_view 変換
     }
 };
 ```

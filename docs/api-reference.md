@@ -11,54 +11,54 @@ Omusubi APIの完全なリファレンスドキュメントです。
 
 ## Core Types
 
-### StringView
+### std::string_view（UTF-8ヘルパー付き）
 
-非所有のUTF-8文字列ビュー。
+標準ライブラリの`std::string_view`を使用し、UTF-8ヘルパー関数を提供。
 
 ```cpp
-class StringView {
-public:
-    // コンストラクタ
-    constexpr StringView() noexcept;
-    constexpr StringView(const char* data, uint32_t byte_length) noexcept;
+// std::string_viewを直接使用
+#include <string_view>
+#include <omusubi/core/string_view.h>  // UTF-8ヘルパー
 
-    // 静的ファクトリ
-    static StringView from_c_string(const char* str);
+// omusubiが提供するヘルパー関数
+namespace omusubi {
+    // UTF-8文字数を取得
+    constexpr uint32_t char_length(std::string_view sv) noexcept;
 
-    // アクセサ
-    constexpr const char* data() const noexcept;
-    constexpr uint32_t byte_length() const noexcept;
-    uint32_t char_count() const noexcept;
+    // UTF-8文字インデックスからバイト位置を取得
+    constexpr uint32_t get_char_position(std::string_view sv, uint32_t char_index) noexcept;
 
-    // 文字アクセス
-    StringView get_char(uint32_t char_index) const noexcept;
+    // 空かどうか判定
+    constexpr bool is_empty(std::string_view sv) noexcept;
 
-    // 比較
-    bool equals(StringView other) const noexcept;
-    bool operator==(StringView other) const noexcept;
-    bool operator!=(StringView other) const noexcept;
+    // 等価判定
+    constexpr bool equals(std::string_view a, std::string_view b) noexcept;
 
-    // イテレータ
-    const char* begin() const noexcept;
-    const char* end() const noexcept;
-};
+    // C文字列からstd::string_viewを構築
+    std::string_view from_c_string(const char* str) noexcept;
+}
+
 ```
 
 **使用例:**
 
 ```cpp
-// 文字列リテラル
-using namespace omusubi::literals;
-StringView msg = "Hello"_sv;
+// 文字列リテラル（標準ライブラリの_svを使用）
+using namespace std::literals;
+std::string_view msg = "Hello"sv;
 
 // C文字列から
 const char* str = "World";
-StringView view = StringView::from_c_string(str);
+std::string_view view = omusubi::from_c_string(str);
 
 // 比較
-if (msg == "Hello"_sv) {
+if (msg == "Hello"sv) {
     // ...
 }
+
+// UTF-8文字数（日本語など）
+std::string_view japanese = "こんにちは"sv;
+uint32_t char_count = omusubi::char_length(japanese);  // 5
 ```
 
 ### FixedString<N>
@@ -72,7 +72,7 @@ public:
     // コンストラクタ
     FixedString() noexcept;
     explicit FixedString(const char* str) noexcept;
-    explicit FixedString(StringView view) noexcept;
+    explicit FixedString(std::string_view view) noexcept;
 
     // 容量・サイズ
     constexpr uint32_t capacity() const noexcept;
@@ -81,20 +81,20 @@ public:
     // アクセサ
     const char* data() const noexcept;
     const char* c_str() const noexcept;
-    StringView view() const noexcept;
+    std::string_view view() const noexcept;
 
     // 変更
-    bool append(StringView view) noexcept;
+    bool append(std::string_view view) noexcept;
     bool append(const char* str) noexcept;
     bool append(char c) noexcept;
     void clear() noexcept;
 
     // 比較
-    bool operator==(StringView other) const noexcept;
-    bool operator!=(StringView other) const noexcept;
+    bool operator==(std::string_view other) const noexcept;
+    bool operator!=(std::string_view other) const noexcept;
 
     // 文字アクセス
-    StringView get_char(uint32_t char_index) const noexcept;
+    std::string_view get_char(uint32_t char_index) const noexcept;
 
     // spanサポート
     span<char> as_span() noexcept;
@@ -123,14 +123,14 @@ static_assert(str2.byte_length() == 5, "compile-time check");
 
 // 容量256バイトの文字列
 FixedString<256> str;
-str.append("Hello"_sv);
-str.append(" World"_sv);
+str.append("Hello"sv);
+str.append(" World"sv);
 
 // C文字列として取得
 const char* cstr = str.c_str();
 
-// StringViewに変換
-StringView view = str.view();
+// std::string_viewに変換
+std::string_view view = str.view();
 ```
 
 ### FixedBuffer<N>
@@ -303,7 +303,7 @@ constexpr FixedString<Capacity> format_to(const char (&fmt)[N], Args&&... args);
 | `{:X}` | 16進整数（大文字） | int, uint, etc. |
 | `{:b}` | 2進整数 | int, uint, etc. |
 | `{:f}` | 浮動小数点 | float, double |
-| `{:s}` | 文字列 | StringView, const char* |
+| `{:s}` | 文字列 | std::string_view, const char* |
 
 **使用例:**
 
@@ -424,7 +424,7 @@ public:
 ```cpp
 char line_buffer[256];
 size_t n = device->read_line(span<char>(line_buffer, 256));
-StringView line(line_buffer, n);
+std::string_view line(line_buffer, n);
 ```
 
 ### ByteWritable
@@ -459,7 +459,7 @@ public:
 **使用例:**
 
 ```cpp
-device->write_text("Hello"_sv);
+device->write_text("Hello"sv);
 ```
 
 ### Connectable
@@ -579,7 +579,7 @@ public:
     virtual void clear() = 0;
     virtual void set_text_color(uint16_t color) = 0;
     virtual void set_text_size(uint8_t size) = 0;
-    virtual void draw_text(int16_t x, int16_t y, StringView text) = 0;
+    virtual void draw_text(int16_t x, int16_t y, std::string_view text) = 0;
     virtual void fill_screen(uint16_t color) = 0;
 };
 ```
@@ -590,7 +590,7 @@ public:
 display->clear();
 display->set_text_color(0xFFFF);
 display->set_text_size(2);
-display->draw_text(0, 0, "Hello"_sv);
+display->draw_text(0, 0, "Hello"sv);
 ```
 
 ## Contexts
@@ -810,7 +810,7 @@ ctx.reset();  // システム再起動
 #include <omusubi/omusubi.h>
 
 using namespace omusubi;
-using namespace omusubi::literals;
+using namespace std::literals;
 
 // グローバルでContextを取得
 SystemContext& ctx = get_system_context();
@@ -829,7 +829,7 @@ void loop() {
     ctx.update();
 
     // デバイス使用
-    serial->write_text("Hello"_sv);
+    serial->write_text("Hello"sv);
 
     ctx.delay(1000);
 }
@@ -852,7 +852,7 @@ void setup() {
     display = ctx.get_output_context()->get_display_context();
 
     // WiFi接続
-    wifi->connect_to("SSID"_sv, "password"_sv);
+    wifi->connect_to("SSID"sv, "password"sv);
 }
 
 void loop() {
@@ -860,7 +860,7 @@ void loop() {
 
     // 各デバイス使用
     if (wifi->is_connected()) {
-        display->draw_text(0, 0, "WiFi Connected"_sv);
+        display->draw_text(0, 0, "WiFi Connected"sv);
     }
 
     ctx.delay(100);
@@ -869,19 +869,19 @@ void loop() {
 
 ## 型変換とヘルパー関数
 
-### StringView変換
+### std::string_view変換
 
 ```cpp
-// C文字列 → StringView
-StringView view = StringView::from_c_string("Hello");
+// C文字列 → std::string_view
+std::string_view view = omusubi::from_c_string("Hello");
 
-// FixedString → StringView
+// FixedString → std::string_view
 FixedString<256> str("World");
-StringView view = str.view();
+std::string_view view = str.view();
 
-// リテラル → StringView
-using namespace omusubi::literals;
-StringView view = "Hello"_sv;
+// リテラル → std::string_view
+using namespace std::literals;
+std::string_view view = "Hello"sv;
 ```
 
 ### span変換
@@ -906,7 +906,7 @@ Omusubiは例外を使用しません。エラーは返り値で通知されま�
 
 ```cpp
 // bool返り値（成功/失敗）
-if (!wifi->connect_to("SSID"_sv, "password"_sv)) {
+if (!wifi->connect_to("SSID"sv, "password"sv)) {
     // 接続失敗
 }
 
@@ -930,7 +930,7 @@ if (serial == nullptr) {
 ```cpp
 // ❌ 遅い（毎回チェーンを辿る）
 void loop() {
-    ctx.get_connectable_context()->get_serial_context(0)->write("data"_sv);
+    ctx.get_connectable_context()->get_serial_context(0)->write("data"sv);
 }
 
 // ✅ 速い（ポインタをキャッシュ）
@@ -941,7 +941,7 @@ void setup() {
 }
 
 void loop() {
-    serial->write("data"_sv);
+    serial->write("data"sv);
 }
 ```
 
@@ -952,7 +952,7 @@ void loop() {
 void process(FixedString<256> str) { }
 
 // ✅ ゼロコピー
-void process(StringView str) { }
+void process(std::string_view str) { }
 void process(span<const char> str) { }
 ```
 

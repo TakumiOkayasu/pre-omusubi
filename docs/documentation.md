@@ -184,7 +184,7 @@ public:
  * @note 容量を超える場合は何も追加せずfalseを返す
  * @warning データの長さが0の場合もfalseを返す
  */
-bool append(StringView data);
+bool append(std::string_view data);
 ```
 
 ### 4. 複雑なロジックのコメント
@@ -321,7 +321,7 @@ bool is_utf8_boundary(uint8_t byte) {
 #include <omusubi/omusubi.h>
 
 using namespace omusubi;
-using namespace omusubi::literals;
+using namespace std::literals;
 
 // グローバル変数: setup() で一度だけ取得
 SystemContext& ctx = get_system_context();
@@ -362,7 +362,7 @@ void setup() {
 }
 
 void loop() {
-    serial->write("Hello"_sv);
+    serial->write("Hello"sv);
     ctx.delay(1000);
 }
 ```
@@ -378,7 +378,7 @@ void setup() {
 
     // WiFi に接続
     auto* wifi = ctx.get_connectable_context()->get_wifi_context();
-    wifi->connect_to("SSID"_sv, "password"_sv);
+    wifi->connect_to("SSID"sv, "password"sv);
 }
 ```
 

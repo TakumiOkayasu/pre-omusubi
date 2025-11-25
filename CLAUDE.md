@@ -178,28 +178,28 @@ return value2;
 // ❌ Before
 constexpr int get_value() const;
 bool is_valid() const;
-StringView get_name() const;
+std::string_view get_name() const;
 
 // ✅ After
 [[nodiscard]] constexpr int get_value() const;
 [[nodiscard]] bool is_valid() const;
-[[nodiscard]] StringView get_name() const;
+[[nodiscard]] std::string_view get_name() const;
 
 // ★ "All parameters should be named"
 // ❌ Before
 void func(int, bool);
-virtual void handle(StringView) = 0;
+virtual void handle(std::string_view) = 0;
 
 // ✅ After
 void func(int value, bool flag);
-virtual void handle(StringView message) = 0;
+virtual void handle(std::string_view message) = 0;
 
 // ★ "Use 'override' instead of 'virtual'"
 // ❌ Before
-virtual void write(StringView msg);  // In derived class
+virtual void write(std::string_view msg);  // In derived class
 
 // ✅ After
-void write(StringView msg) override;
+void write(std::string_view msg) override;
 
 // ★ "Make member function 'const'"
 // ❌ Before
@@ -237,7 +237,7 @@ get_system_context()->get_[category]_context()->get_[device]_context()->method()
 
 **Pattern 1: Basic (3-layer)** - Most devices
 ```cpp
-ctx->get_connectable_context()->get_serial_context(0)->write("Hello"_sv);
+ctx->get_connectable_context()->get_serial_context(0)->write("Hello"sv);
 ctx->get_sensor_context()->get_accelerometer_context()->get_values();
 ```
 
@@ -261,7 +261,7 @@ Use hierarchical when:
 **1. Interface Layer** (`include/omusubi/interface/`)
 - `*able` interfaces: `ByteReadable`, `TextReadable`, `ByteWritable`, `TextWritable`, `Connectable`, `Scannable`, etc.
 - Each interface = single responsibility (ISP)
-- Return abstract types (`StringView`) not concrete (`FixedString<N>`)
+- Return abstract types (`std::string_view`) not concrete (`FixedString<N>`)
 - Separate text/byte I/O (Java `Reader`/`Writer` vs `InputStream`/`OutputStream` pattern)
 
 **2. Context Layer** (`include/omusubi/context/`)
@@ -370,7 +370,7 @@ auto retry_count = 0;  // Wrong - int, not uint32_t
 
 **Other Rules**
 - **Macros:** Prohibited - use `constexpr`
-- **String literals:** Use `_sv` suffix (`using namespace omusubi::literals`)
+- **String literals:** Use `_sv` suffix (`using namespace std::literals`)
 - **Header guards:** `#pragma once`
 - **`std::move()`:** DO NOT use - prevents RVO, unnecessary for small stack objects
 - **Comments:** Only when essential - code should be self-explanatory
@@ -448,7 +448,7 @@ void setup() {
 
 void loop() {
     ctx.update();
-    serial->write("Hello"_sv);  // Use cached pointer
+    serial->write("Hello"sv);  // Use cached pointer
     ctx.delay(10);
 }
 ```
@@ -467,7 +467,7 @@ public:
 
 ## Core Types
 
-- `StringView` - Non-owning string reference (UTF-8)
+- `std::string_view` - Non-owning string reference (UTF-8, with omusubi UTF-8 helpers)
 - `FixedString<N>` - Stack string with fixed capacity
 - `FixedBuffer<N>` - Stack byte buffer
 - `Vector3` - 3D vector for sensors
@@ -485,7 +485,7 @@ Pattern for M5Stack platform examples (※実機用コードは別リポジト�
 #include <omusubi/omusubi.h>
 
 using namespace omusubi;
-using namespace omusubi::literals;
+using namespace std::literals;
 
 SystemContext& ctx = get_system_context();
 SerialContext* serial = nullptr;
@@ -513,13 +513,13 @@ Guidelines:
 
 Depend only on interfaces for hardware-agnostic code:
 ```cpp
-void log_message(TextWritable& output, StringView message) {
-    output.write("[LOG] "_sv);
+void log_message(TextWritable& output, std::string_view message) {
+    output.write("[LOG] "sv);
     output.write_line(message);
 }
 
-log_message(*serial, "Started"_sv);    // Works with any TextWritable
-log_message(*display, "Started"_sv);
+log_message(*serial, "Started"sv);    // Works with any TextWritable
+log_message(*display, "Started"sv);
 ```
 
 ## Documentation Management

@@ -123,16 +123,16 @@ class WiFiContext : public Connectable, public Scannable {
 
 ```cpp
 // v1.0.0 (バグあり)
-bool append(StringView str) {
-    if (length_ + str.byte_length() >= capacity_) {  // ❌ >= は間違い
+bool append(std::string_view str) {
+    if (length_ + str.size() >= capacity_) {  // ❌ >= は間違い
         return false;
     }
     // ...
 }
 
 // v1.0.1 (バグ修正)
-bool append(StringView str) {
-    if (length_ + str.byte_length() > capacity_) {  // ✅ > が正しい
+bool append(std::string_view str) {
+    if (length_ + str.size() > capacity_) {  // ✅ > が正しい
         return false;
     }
     // ...
@@ -436,7 +436,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2025-09-01
 
 ### Added
-- StringView 実装
+- std::string_view UTF-8ヘルパー関数
 - FixedString 実装
 
 ## [1.0.0] - 2025-08-01
@@ -489,7 +489,7 @@ git commit -m "perf(string): optimize UTF-8 character counting"
 ```cpp
 // v1.0.0 のコード
 SerialContext* serial = ctx.get_serial_context(0);
-serial->write("Hello"_sv);
+serial->write("Hello"sv);
 
 // v1.1.0, v1.2.0, v1.0.1 でも同じコードが動作
 ```

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <omusubi/core/string_view.h>
-
 #include <cstdint>
+#include <string_view>
 
 namespace omusubi {
 
@@ -10,7 +9,7 @@ namespace omusubi {
  * @brief システム情報コンテキスト
  *
  * Java設計思想: java.lang.Systemに相当
- * - 具体型（FixedString）ではなく抽象型（StringView）を返す
+ * - 具体型（FixedString）ではなく抽象型（std::string_view）を返す
  * - getProperty()のような設計
  */
 class SystemInfoContext {
@@ -23,10 +22,10 @@ public:
     SystemInfoContext& operator=(SystemInfoContext&&) = delete;
 
     /** @brief デバイス名を取得（Java String相当） */
-    virtual StringView get_device_name() const = 0;
+    virtual std::string_view get_device_name() const = 0;
 
     /** @brief ファームウェアバージョンを取得（Java String相当） */
-    virtual StringView get_firmware_version() const = 0;
+    virtual std::string_view get_firmware_version() const = 0;
 
     /** @brief チップIDを取得 */
     virtual uint64_t get_chip_id() const = 0;

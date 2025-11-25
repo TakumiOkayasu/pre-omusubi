@@ -1,8 +1,7 @@
 #pragma once
 
-#include <omusubi/core/string_view.h>
-
 #include <cstdint>
+#include <string_view>
 
 namespace omusubi {
 
@@ -19,7 +18,7 @@ public:
     Displayable& operator=(Displayable&&) = delete;
 
     /** @brief 文字列を表示 */
-    virtual void display(StringView text) = 0;
+    virtual void display(std::string_view text) = 0;
 };
 
 } // namespace omusubi

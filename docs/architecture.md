@@ -187,7 +187,7 @@ BLEContext* ble = ctx->get_connectable_context()->get_ble_context();
 // 階層的（4層+）: → Component（Service, Characteristic）
 BLEService* service = ble->add_service(service_uuid);
 BLECharacteristic* ch = service->add_characteristic(char_uuid, properties);
-ch->write("data"_sv);
+ch->write("data"sv);
 ```
 
 **命名規則（重要）:**
@@ -254,8 +254,8 @@ struct BluetoothImpl {
 static BluetoothImpl impl;  // staticによる単一インスタンス
 }
 
-void M5StackBluetoothContext::write(StringView text) {
-    impl.bt.write(text.data(), text.byte_length());
+void M5StackBluetoothContext::write(std::string_view text) {
+    impl.bt.write(text.data(), text.size());
 }
 ```
 
@@ -303,7 +303,7 @@ SystemContext → CategoryContext → DeviceContext → method()
 
 ```cpp
 // シリアル通信
-ctx->get_connectable_context()->get_serial_context(0)->write("Hello"_sv);
+ctx->get_connectable_context()->get_serial_context(0)->write("Hello"sv);
 
 // WiFi接続
 ctx->get_connectable_context()->get_wifi_context()->connect_to(ssid, password);
@@ -325,7 +325,7 @@ SystemContext → CategoryContext → DeviceContext → Component → method()
 BLEContext* ble = ctx->get_connectable_context()->get_ble_context();
 BLEService* service = ble->add_service(uuid);
 BLECharacteristic* ch = service->add_characteristic(uuid, props);
-ch->write("Hello"_sv);
+ch->write("Hello"sv);
 ```
 
 ### パフォーマンス最適化
@@ -335,7 +335,7 @@ ch->write("Hello"_sv);
 ```cpp
 // ❌ 毎回チェーンを辿る（低速）
 void loop() {
-    ctx.get_connectable_context()->get_serial_context(0)->write("data"_sv);
+    ctx.get_connectable_context()->get_serial_context(0)->write("data"sv);
 }
 
 // ✅ setup()で一度取得してキャッシュ（高速）
@@ -346,7 +346,7 @@ void setup() {
 }
 
 void loop() {
-    serial->write("data"_sv);  // 直接アクセス（オーバーヘッドなし）
+    serial->write("data"sv);  // 直接アクセス（オーバーヘッドなし）
 }
 ```
 
@@ -485,8 +485,8 @@ public:
 // include/omusubi/interface/configurable.h
 class Configurable {
 public:
-    virtual bool set_parameter(StringView key, StringView value) = 0;
-    virtual StringView get_parameter(StringView key) const = 0;
+    virtual bool set_parameter(std::string_view key, std::string_view value) = 0;
+    virtual std::string_view get_parameter(std::string_view key) const = 0;
 };
 ```
 
@@ -634,7 +634,7 @@ void setup() {
 }
 
 void loop() {
-    serial->write("data"_sv);  // 高速アクセス
+    serial->write("data"sv);  // 高速アクセス
 }
 ```
 
@@ -654,7 +654,7 @@ void process(FixedString<256> str);
 
 // ✅ ゼロコピー
 void process(span<const char> str);
-void process(StringView str);
+void process(std::string_view str);
 ```
 
 ### 4. テンプレートによるコンパイル時最適化

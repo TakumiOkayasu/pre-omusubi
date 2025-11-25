@@ -27,7 +27,7 @@ auto str = static_string("Hello");
 ```cpp
 // ✗ 冗長なテンプレートパラメータ
 FixedString<64> buffer;
-buffer.append("Hello"_sv);
+buffer.append("Hello"sv);
 
 // ✅ テンプレートパラメータを推論
 auto msg = static_string("Hello");  // StaticString<5>が推論される
@@ -265,7 +265,7 @@ uint8_t* buffer = get_buffer();  // uint8_t* (not auto)
 ```cpp
 // ✅ Explicit conversion for correctness
 auto s = some_span();
-auto sv = StringView{s.data(), static_cast<uint32_t>(s.size())};
+auto sv = std::string_view{s.data(), s.size()};
 //                                ^^^^^^^^^^^^^^^^^^^^^^^^ 明示的キャスト
 ```
 
@@ -289,7 +289,7 @@ class MyReadable : public Readable {
 ### 注意1: `const auto&` vs `auto`
 
 ```cpp
-StringView get_view();
+std::string_view get_view();
 
 // ✗ Dangling reference
 const auto& view = get_view();  // 一時オブジェクトへの参照（危険）
@@ -369,7 +369,7 @@ constexpr auto combined = msg1 + msg2;
 
 ```cpp
 FixedString<64> buffer;
-buffer.append("Hello"_sv);
+buffer.append("Hello"sv);
 
 // ✗ Verbose
 for (FixedString<64>::const_iterator it = buffer.begin();
@@ -451,7 +451,7 @@ auto result = perform_operation();  // What type is this?
    - ムーブセマンティクスによる最適化の余地がない
 
 2. **小さなオブジェクト**
-   - `StringView`: ポインタ + 長さ (8～16バイト)
+   - `std::string_view`: ポインタ + 長さ (8～16バイト)
    - `span<T>`: ポインタ + サイズ (8～16バイト)
    - `FixedString<N>`: スタック配列（小さい）
    - コピーコストが極めて低い
@@ -483,26 +483,26 @@ constexpr typename std::remove_reference<T>::type&& move(T&& t) noexcept {
 #### ❌ 誤用1: 小さなオブジェクトでの使用
 
 ```cpp
-// ✗ 誤用: StringViewは小さい（ポインタ+長さ = 8～16バイト）
-StringView get_view() {
-    StringView view = "Hello"_sv;
+// ✗ 誤用: std::string_viewは小さい（ポインタ+長さ = 8～16バイト）
+std::string_view get_view() {
+    std::string_view view = "Hello"sv;
     return std::move(view);  // ← 無意味、むしろ最適化を妨げる
 }
 
 // ✅ 正しい: 単純にreturn（RVOが働く）
-StringView get_view() {
-    StringView view = "Hello"_sv;
+std::string_view get_view() {
+    std::string_view view = "Hello"sv;
     return view;  // ← コンパイラが最適化（NRVO）
 }
 
 // ✅ さらに良い: 直接return
-StringView get_view() {
-    return "Hello"_sv;  // ← 最適
+std::string_view get_view() {
+    return "Hello"sv;  // ← 最適
 }
 ```
 
 **なぜ誤用か:**
-- `StringView`はポインタと長さだけ（8～16バイト）
+- `std::string_view`はポインタと長さだけ（8～16バイト）
 - レジスタに収まるサイズ
 - コピーコストは極めて低い
 - `std::move()`はRVO（Return Value Optimization）を妨げる可能性がある
@@ -532,14 +532,14 @@ constexpr auto create_string() {
 
 ```cpp
 // ✗ 危険: ローカル変数への参照をムーブ
-StringView& get_view_ref() {
-    StringView view = "Hello"_sv;
+std::string_view& get_view_ref() {
+    std::string_view view = "Hello"sv;
     return std::move(view);  // ← ダングリング参照！
 }
 
 // ✅ 正しい: 値で返す
-StringView get_view() {
-    StringView view = "Hello"_sv;
+std::string_view get_view() {
+    std::string_view view = "Hello"sv;
     return view;
 }
 ```
@@ -607,8 +607,8 @@ auto moved_ptr = std::move(ptr);  // 所有権を移動
 
 ```cpp
 // ✅ Recommended
-StringView get_view() {
-    return "Hello"_sv;
+std::string_view get_view() {
+    return "Hello"sv;
 }
 
 auto create_buffer() {

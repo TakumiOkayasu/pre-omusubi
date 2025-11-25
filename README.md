@@ -29,7 +29,7 @@ SystemContextを中心としたクリーンなアーキテクチャにより、�
 ```
 omusubi/                      # プラットフォーム非依存のコアライブラリ
 ├── include/omusubi/          # ヘッダーファイル（プラットフォーム非依存）
-│   ├── core/                 # コアユーティリティ（Result, Logger, StringView等）
+│   ├── core/                 # コアユーティリティ（Result, Logger, format等）
 │   ├── interface/            # インターフェース定義（*able）
 │   ├── context/              # Context層（DI container）
 │   ├── device/               # デバイス層（具象デバイスContext）
@@ -160,7 +160,7 @@ make test
 
 **Omusubiコア部分は外部ライブラリに依存していません。**
 
-- コア機能（Result, Logger, StringViewなど）は標準C++17のみ使用（Optionalはstd::optional）
+- コア機能（Result, Logger, format等）は標準C++17のみ使用（std::string_view, std::optionalを使用）
 - ライセンス制約なし、商用利用完全自由
 - プラットフォーム実装（M5Stackなど）のみが外部ライブラリに依存
 

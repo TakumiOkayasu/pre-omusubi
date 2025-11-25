@@ -104,7 +104,7 @@ int main() {
     }
 
     printf("\n--- 制限事項 ---\n");
-    printf("・const char*やStringViewは最大64文字と仮定\n");
+    printf("・const char*やstd::string_viewは最大64文字と仮定\n");
     printf("・実際の文字列長が64文字を超える場合、切り詰められる可能性\n");
     printf("・その場合は明示的にCapacityを指定することを推奨\n");
 

@@ -39,7 +39,7 @@ namespace utf8 {
 ```
 
 **適用箇所**:
-- `/workspace/include/omusubi/core/string_view.h` - `omusubi::utf8`, `omusubi::literals`
+- `/workspace/include/omusubi/core/string_view.h` - `omusubi::utf8`
 - `/workspace/include/omusubi/core/string_base.hpp` - `omusubi::utf8`
 - `/workspace/include/omusubi/core/mcu_config.h` - `omusubi::config`
 - `/workspace/include/omusubi/core/logger.hpp` - `omusubi::detail`
@@ -98,11 +98,11 @@ public:
 
     constexpr uint32_t byte_length() const noexcept { return byte_length_; }
 
-    constexpr bool append(StringView view) noexcept {
-        if (byte_length_ + view.byte_length() > Capacity) {
+    constexpr bool append(std::string_view view) noexcept {
+        if (byte_length_ + view.size() > Capacity) {
             return false;
         }
-        for (uint32_t i = 0; i < view.byte_length(); ++i) {
+        for (uint32_t i = 0; i < view.size(); ++i) {
             buffer_[byte_length_++] = view[i];
         }
         buffer_[byte_length_] = '\0';

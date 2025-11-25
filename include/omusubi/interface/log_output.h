@@ -1,9 +1,9 @@
 #pragma once
 
 #include <omusubi/core/log_level.h>
-#include <omusubi/core/string_view.h>
 
 #include <cstdint>
+#include <string_view>
 
 namespace omusubi {
 
@@ -20,7 +20,7 @@ public:
      * @param level ログレベル
      * @param message ログメッセージ
      */
-    virtual void write(LogLevel level, StringView message) = 0;
+    virtual void write(LogLevel level, std::string_view message) = 0;
 
     /**
      * @brief 出力をフラッシュ（オプション）

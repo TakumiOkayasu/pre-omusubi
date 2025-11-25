@@ -26,11 +26,11 @@ void setup() {
     logger = &log;
 
     // ログ出力テスト
-    logger->info(StringView("System started", 14));
-    logger->debug(StringView("This debug message is hidden", 28)); // min_level=INFOなので出力されない
+    logger->info(std::string_view("System started", 14));
+    logger->debug(std::string_view("This debug message is hidden", 28)); // min_level=INFOなので出力されない
 
     // テンプレート関数を使用した出力（リリースビルドで最適化）
-    log_at<LogLevel::INFO>(*logger, StringView("Logger initialized", 18));
+    log_at<LogLevel::INFO>(*logger, std::string_view("Logger initialized", 18));
 }
 
 void loop() {
@@ -41,15 +41,15 @@ void loop() {
     ++counter;
 
     if (counter % 100 == 0) {
-        log_at<LogLevel::INFO>(*logger, StringView("Loop count: 100", 15));
+        log_at<LogLevel::INFO>(*logger, std::string_view("Loop count: 100", 15));
     }
 
     if (counter == 1000) {
-        log_at<LogLevel::WARNING>(*logger, StringView("High loop count", 15));
+        log_at<LogLevel::WARNING>(*logger, std::string_view("High loop count", 15));
     }
 
     if (counter > 10000) {
-        log_at<LogLevel::ERROR>(*logger, StringView("Loop count exceeded", 19));
+        log_at<LogLevel::ERROR>(*logger, std::string_view("Loop count exceeded", 19));
         counter = 0; // リセット
     }
 

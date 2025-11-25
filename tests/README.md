@@ -9,7 +9,7 @@
 | テストファイル | 対象 | 説明 |
 |---------------|------|------|
 | `test_span.cpp` | `span<T>` | 非所有メモリビュー（C++20 std::spanの簡易版） |
-| `test_string_view.cpp` | `StringView` | UTF-8対応の文字列ビュー |
+| `test_string_view.cpp` | `std::string_view` | UTF-8対応のヘルパー関数 |
 | `test_fixed_string.cpp` | `FixedString<N>` | 固定長UTF-8文字列（ヒープ確保なし） |
 | `test_fixed_buffer.cpp` | `FixedBuffer<N>` | 固定長バイトバッファ（ヒープ確保なし） |
 | `test_vector3.cpp` | `Vector3` | 3次元ベクトル（センサーデータ用） |
@@ -125,7 +125,7 @@ tests/
 ├── README.md              # このファイル
 ├── Makefile               # レガシーMakefile（非推奨）
 ├── test_span.cpp          # span<T>テスト
-├── test_string_view.cpp   # StringViewテスト
+├── test_string_view.cpp   # std::string_view UTF-8ヘルパー関数テスト
 ├── test_fixed_string.cpp  # FixedString<N>テスト
 ├── test_fixed_buffer.cpp  # FixedBuffer<N>テスト
 ├── test_vector3.cpp       # Vector3テスト

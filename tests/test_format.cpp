@@ -62,8 +62,8 @@ TEST_CASE("Format - 各種型") {
         CHECK_EQ(strcmp(result.c_str(), "Char: A"), 0);
     }
 
-    SUBCASE("StringView") {
-        auto result = format<128>("View: {}", StringView("test"));
+    SUBCASE("std::string_view") {
+        auto result = format<128>("View: {}", std::string_view("test"));
         CHECK_EQ(strcmp(result.c_str(), "View: test"), 0);
     }
 }

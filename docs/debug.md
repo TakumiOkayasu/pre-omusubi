@@ -82,16 +82,16 @@ void setup() {
     serial = ctx.get_connectable_context()->get_serial_context(0);
 
     // デバッグログ
-    serial->write("[DEBUG] setup() started\n"_sv);
+    serial->write("[DEBUG] setup() started\n"sv);
 }
 
 void loop() {
     ctx.update();
 
     // 変数の値を出力
-    serial->write("[DEBUG] counter="_sv);
+    serial->write("[DEBUG] counter="sv);
     // counter の値を出力
-    serial->write("\n"_sv);
+    serial->write("\n"sv);
 
     ctx.delay(1000);
 }
@@ -125,19 +125,19 @@ void setup() {
     logger = &log;
 
     // ログ出力
-    logger->info(StringView("System started", 14));
-    logger->debug(StringView("Debug info", 10));  // min_level=INFOなので出力されない
+    logger->info(std::string_view("System started", 14));
+    logger->debug(std::string_view("Debug info", 10));  // min_level=INFOなので出力されない
 }
 
 void loop() {
     ctx.update();
 
     // 各ログレベルでの出力
-    logger->debug(StringView("Debug message", 13));
-    logger->info(StringView("Info message", 12));
-    logger->warning(StringView("Warning message", 15));
-    logger->error(StringView("Error message", 13));
-    logger->critical(StringView("Critical message", 16));
+    logger->debug(std::string_view("Debug message", 13));
+    logger->info(std::string_view("Info message", 12));
+    logger->warning(std::string_view("Warning message", 15));
+    logger->error(std::string_view("Error message", 13));
+    logger->critical(std::string_view("Critical message", 16));
 
     ctx.delay(1000);
 }
@@ -170,15 +170,15 @@ Loggerクラスには、テンプレート特殊化によりコンパイル時�
 // テンプレート関数 log_at<Level> を使用
 void process() {
     // リリースビルド（NDEBUG定義時）ではDEBUGログが完全に削除される
-    log_at<LogLevel::DEBUG>(*logger, StringView("process() called", 16));
-    log_at<LogLevel::INFO>(*logger, StringView("Processing data", 15));
+    log_at<LogLevel::DEBUG>(*logger, std::string_view("process() called", 16));
+    log_at<LogLevel::INFO>(*logger, std::string_view("Processing data", 15));
 
     // 処理本体
 }
 
 // 通常のメソッド呼び出しも可能（実行時フィルタリング）
-logger->debug(StringView("Debug", 5));
-logger->info(StringView("Info", 4));
+logger->debug(std::string_view("Debug", 5));
+logger->info(std::string_view("Info", 4));
 ```
 
 **実装の仕組み:**
@@ -186,7 +186,7 @@ logger->info(StringView("Info", 4));
 // テンプレート特殊化によりDEBUGログを削除
 template <>
 struct LogDispatcher<LogLevel::DEBUG, false> {  // false = リリースビルド
-    static void dispatch(const Logger&, StringView) {
+    static void dispatch(const Logger&, std::string_view) {
         // 空実装 - コンパイラの最適化により完全に削除される
     }
 };
@@ -208,15 +208,15 @@ private:
 
 public:
     explicit FunctionTracer(const char* name) : name_(name) {
-        serial->write("[ENTER] "_sv);
+        serial->write("[ENTER] "sv);
         serial->write(name_);
-        serial->write("\n"_sv);
+        serial->write("\n"sv);
     }
 
     ~FunctionTracer() {
-        serial->write("[EXIT] "_sv);
+        serial->write("[EXIT] "sv);
         serial->write(name_);
-        serial->write("\n"_sv);
+        serial->write("\n"sv);
     }
 };
 
@@ -241,20 +241,20 @@ void connect_device() {
 **変数の内容を詳細に出力。**
 
 ```cpp
-void dump_vector3(StringView name, const Vector3& v) {
+void dump_vector3(std::string_view name, const Vector3& v) {
     serial->write(name);
-    serial->write(" = { x: "_sv);
+    serial->write(" = { x: "sv);
     // v.x を出力
-    serial->write(", y: "_sv);
+    serial->write(", y: "sv);
     // v.y を出力
-    serial->write(", z: "_sv);
+    serial->write(", z: "sv);
     // v.z を出力
-    serial->write(" }\n"_sv);
+    serial->write(" }\n"sv);
 }
 
 // 使用例
 Vector3 acceleration = sensor->get_values();
-dump_vector3("acceleration"_sv, acceleration);
+dump_vector3("acceleration"sv, acceleration);
 // 出力: acceleration = { x: 0.0, y: 0.0, z: 9.8 }
 ```
 
@@ -289,13 +289,13 @@ void set_buffer_size(uint32_t size) {
     #define ASSERT_MSG(condition, message) \
         do { \
             if (!(condition)) { \
-                serial->write("[ASSERTION FAILED] "_sv); \
+                serial->write("[ASSERTION FAILED] "sv); \
                 serial->write(__FILE__); \
                 serial->write(":"); \
                 serial->write(__LINE__); \
-                serial->write(" - "_sv); \
+                serial->write(" - "sv); \
                 serial->write(message); \
-                serial->write("\n"_sv); \
+                serial->write("\n"sv); \
                 while (true) { }  // 停止 \
             } \
         } while (0)
@@ -485,7 +485,7 @@ void loop() {
 void setup() {
     // 前回のクラッシュ情報を表示
     if (ESP.getResetReason() == "SW_CPU_RESET") {
-        serial->write("前回はソフトウェアリセット\n"_sv);
+        serial->write("前回はソフトウェアリセット\n"sv);
     }
 
     // スタックトレース出力
@@ -499,7 +499,7 @@ void setup() {
 
 ```cpp
 // WiFi経由でログ送信
-void remote_log(StringView message) {
+void remote_log(std::string_view message) {
     if (wifi->is_connected()) {
         // UDP パケットでログサーバーに送信
         udp->send(LOG_SERVER_IP, LOG_SERVER_PORT, message);
@@ -578,12 +578,12 @@ void process() {
 ```cpp
 // ❌ 問題
 SerialContext* serial = nullptr;
-serial->write("Hello"_sv);  // クラッシュ
+serial->write("Hello"sv);  // クラッシュ
 
 // ✅ 解決策: アサーションで検出
 SerialContext* serial = ctx.get_serial_context(0);
 assert(serial != nullptr);
-serial->write("Hello"_sv);
+serial->write("Hello"sv);
 ```
 
 ### 4. メモリ破壊
@@ -597,7 +597,7 @@ str.append("This is a very long string");  // 容量超過
 
 // ✅ 解決策: 戻り値チェック
 if (!str.append("This is a very long string")) {
-    log(LogLevel::ERROR, "バッファ容量不足"_sv);
+    log(LogLevel::ERROR, "バッファ容量不足"sv);
 }
 ```
 
@@ -609,7 +609,7 @@ if (!str.append("This is a very long string")) {
 // ❌ 問題: 毎回ポインタ取得
 void loop() {
     auto* serial = ctx.get_connectable_context()->get_serial_context(0);
-    serial->write("data"_sv);  // 毎回メソッドチェーン
+    serial->write("data"sv);  // 毎回メソッドチェーン
 }
 
 // ✅ 解決策: ポインタをキャッシュ
@@ -620,7 +620,7 @@ void setup() {
 }
 
 void loop() {
-    serial->write("data"_sv);  // キャッシュされたポインタ
+    serial->write("data"sv);  // キャッシュされたポインタ
 }
 ```
 

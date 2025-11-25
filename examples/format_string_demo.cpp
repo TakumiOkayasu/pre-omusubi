@@ -49,10 +49,10 @@ int main() {
         // 引数数
         printf("Argument count: %u\n", fs.arg_count());
 
-        // StringViewとして取得
+        // std::string_viewとして取得
         auto view = fs.view();
-        printf("As StringView: ");
-        for (uint32_t i = 0; i < view.byte_length(); ++i) {
+        printf("As std::string_view: ");
+        for (uint32_t i = 0; i < view.size(); ++i) {
             printf("%c", view[i]);
         }
         printf("\n");

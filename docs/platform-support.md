@@ -91,7 +91,7 @@ src_filter =
 #include <omusubi/omusubi.h>
 
 using namespace omusubi;
-using namespace omusubi::literals;
+using namespace std::literals;
 
 SystemContext& ctx = get_system_context();
 SerialContext* serial = nullptr;
@@ -104,7 +104,7 @@ void setup() {
 void loop() {
     ctx.update();
 
-    serial->write_text("Hello, M5Stack!"_sv);
+    serial->write_text("Hello, M5Stack!"sv);
 
     ctx.delay(1000);
 }
@@ -130,7 +130,7 @@ ESP32の制約により、WiFiとBLEを同時に使用するとパフォーマ�
 ```cpp
 // 推奨: WiFiまたはBLEのどちらか一方を使用
 WiFiContext* wifi = ctx.get_connectable_context()->get_wifi_context();
-wifi->connect_to("SSID"_sv, "password"_sv);
+wifi->connect_to("SSID"sv, "password"sv);
 
 // 非推奨: WiFiとBLEの同時使用
 BLEContext* ble = ctx.get_connectable_context()->get_ble_context();
@@ -152,7 +152,7 @@ DisplayContext* display = ctx.get_output_context()->get_display_context();
 
 // 推奨: 変更箇所のみ更新
 display->set_text_color(0xFFFF);
-display->draw_text(0, 0, "Hello"_sv);
+display->draw_text(0, 0, "Hello"sv);
 
 // 非推奨: 全画面更新（遅い）
 display->clear();
@@ -190,7 +190,7 @@ if (!serial->is_connected()) {
 ```cpp
 // WiFiスキャン前に接続を試みる
 WiFiContext* wifi = ctx.get_connectable_context()->get_wifi_context();
-wifi->connect_to("SSID"_sv, "password"_sv);  // スキャンより先に接続
+wifi->connect_to("SSID"sv, "password"sv);  // スキャンより先に接続
 ```
 
 **メモリ不足:**

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <omusubi/core/span.hpp>
 #include <omusubi/core/string_base.hpp>
+#include <string_view>
 
 namespace omusubi {
 
@@ -29,15 +30,16 @@ public:
      */
     constexpr explicit FixedString(const char* str) noexcept : byte_length_(0) {
         buffer_[0] = '\0';
+
         if (str != nullptr) {
-            append(str);
+            append(std::string_view {str});
         }
     }
 
     /**
-     * @brief StringViewから構築
+     * @brief std::string_viewから構築
      */
-    constexpr explicit FixedString(StringView view) noexcept : byte_length_(0) {
+    constexpr explicit FixedString(std::string_view view) noexcept : byte_length_(0) {
         buffer_[0] = '\0';
         append(view);
     }
@@ -45,37 +47,49 @@ public:
     /**
      * @brief 容量を取得
      */
-    constexpr uint32_t capacity() const noexcept { return Capacity; }
+    [[nodiscard]] constexpr uint32_t capacity() const noexcept { return Capacity; }
 
     /**
      * @brief バイト長を取得
      */
-    constexpr uint32_t byte_length() const noexcept { return byte_length_; }
+    [[nodiscard]] constexpr uint32_t byte_length() const noexcept { return byte_length_; }
+
+    /**
+     * @brief サイズを取得（byte_length()のエイリアス、std::string互換）
+     */
+    [[nodiscard]] constexpr size_t size() const noexcept { return byte_length_; }
 
     /**
      * @brief データへのポインタを取得
      */
-    constexpr const char* data() const noexcept { return buffer_; }
+    [[nodiscard]] constexpr const char* data() const noexcept { return buffer_; }
 
     /**
      * @brief C文字列として取得（null終端保証）
      */
-    constexpr const char* c_str() const noexcept { return buffer_; }
+    [[nodiscard]] constexpr const char* c_str() const noexcept { return buffer_; }
 
     /**
-     * @brief StringViewに変換
+     * @brief std::string_viewに変換
      */
-    constexpr StringView view() const noexcept { return StringView(buffer_, byte_length_); }
+    [[nodiscard]] constexpr std::string_view view() const noexcept { return std::string_view {buffer_, byte_length_}; }
+
+    /**
+     * @brief std::string_viewへの暗黙変換
+     */
+    [[nodiscard]] constexpr operator std::string_view() const noexcept { return view(); }
 
     /**
      * @brief 文字列を追加
      */
-    constexpr bool append(StringView view) noexcept {
-        if (byte_length_ + view.byte_length() > Capacity) {
+    constexpr bool append(std::string_view view) noexcept {
+        const auto view_size = static_cast<uint32_t>(view.size());
+
+        if (byte_length_ + view_size > Capacity) {
             return false;
         }
 
-        for (uint32_t i = 0; i < view.byte_length(); ++i) {
+        for (uint32_t i = 0; i < view_size; ++i) {
             buffer_[byte_length_++] = view[i];
         }
 
@@ -91,7 +105,8 @@ public:
         if (str == nullptr) {
             return false;
         }
-        return append(StringView::from_c_string(str));
+
+        return append(from_c_string(str));
     }
 
     /**
@@ -116,49 +131,52 @@ public:
         buffer_[0] = '\0';
     }
 
-    bool operator==(StringView other) const noexcept { return String<FixedString<Capacity>>::equals(other); }
+    [[nodiscard]] bool operator==(std::string_view other) const noexcept { return String<FixedString<Capacity>>::equals(other); }
 
-    bool operator!=(StringView other) const noexcept { return !String<FixedString<Capacity>>::equals(other); }
+    [[nodiscard]] bool operator!=(std::string_view other) const noexcept { return !String<FixedString<Capacity>>::equals(other); }
 
-    constexpr StringView get_char(uint32_t char_index) const noexcept {
+    [[nodiscard]] constexpr std::string_view get_char(uint32_t char_index) const noexcept {
         uint32_t byte_pos = this->get_char_position(char_index);
 
         if (byte_pos >= byte_length_) {
-            return StringView {};
+            return std::string_view {};
         }
 
         uint8_t char_len = utf8::get_char_byte_length(static_cast<uint8_t>(buffer_[byte_pos]));
-        return {buffer_ + byte_pos, char_len};
+
+        return std::string_view {buffer_ + byte_pos, char_len};
     }
 
     /**
      * @brief イテレータ（開始）
      */
-    constexpr const char* begin() const noexcept { return buffer_; }
+    [[nodiscard]] constexpr const char* begin() const noexcept { return buffer_; }
 
     /**
      * @brief イテレータ（終了）
      */
-    constexpr const char* end() const noexcept { return buffer_ + byte_length_; }
+    [[nodiscard]] constexpr const char* end() const noexcept { return buffer_ + byte_length_; }
 
     /**
      * @brief spanとして取得（書き込み可能）
      */
-    constexpr span<char> as_span() noexcept { return span<char>(buffer_, byte_length_); }
+    [[nodiscard]] constexpr span<char> as_span() noexcept { return span<char>(buffer_, byte_length_); }
 
     /**
      * @brief spanとして取得（読み取り専用）
      */
-    constexpr span<const char> as_span() const noexcept { return span<const char>(buffer_, byte_length_); }
+    [[nodiscard]] constexpr span<const char> as_span() const noexcept { return span<const char>(buffer_, byte_length_); }
 
     /**
      * @brief spanから構築
      */
     constexpr void from_span(span<const char> s) noexcept {
         byte_length_ = (s.size() < Capacity) ? static_cast<uint32_t>(s.size()) : Capacity;
+
         for (uint32_t i = 0; i < byte_length_; ++i) {
             buffer_[i] = s[i];
         }
+
         buffer_[byte_length_] = '\0';
     }
 

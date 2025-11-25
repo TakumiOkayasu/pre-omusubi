@@ -1,9 +1,8 @@
 #pragma once
 
-#include <omusubi/core/string_view.h>
-
 #include <cstdint>
 #include <omusubi/core/fixed_string.hpp>
+#include <string_view>
 #include <type_traits>
 
 namespace omusubi {
@@ -100,11 +99,11 @@ public:
     }
 
     /**
-     * @brief StringViewから構築
+     * @brief std::string_viewから構築
      *
-     * 注意: StringViewは実行時値のため、コンパイル時検証不可
+     * 注意: std::string_viewは実行時値のため、コンパイル時検証不可
      */
-    constexpr basic_format_string(StringView sv) noexcept : str_(sv.data()), length_(sv.byte_length()) {}
+    constexpr basic_format_string(std::string_view sv) noexcept : str_(sv.data()), length_(static_cast<uint32_t>(sv.size())) {}
 
     /**
      * @brief C文字列として取得
@@ -112,9 +111,9 @@ public:
     constexpr const char* c_str() const noexcept { return str_; }
 
     /**
-     * @brief StringViewとして取得
+     * @brief std::string_viewとして取得
      */
-    constexpr StringView view() const noexcept { return {str_, length_}; }
+    constexpr std::string_view view() const noexcept { return {str_, length_}; }
 
     /**
      * @brief 長さを取得
@@ -213,9 +212,9 @@ struct max_string_length<char*> {
     static constexpr uint32_t value = 64;
 };
 
-// StringView
+// std::string_view
 template <>
-struct max_string_length<StringView> {
+struct max_string_length<std::string_view> {
     static constexpr uint32_t value = 64;
 };
 
@@ -474,12 +473,15 @@ struct formatter {
             }
             return pos;
         }
-        // StringView型
-        else if constexpr (std::is_same<T, StringView>::value) {
-            uint32_t len = (value.byte_length() < buffer_size) ? value.byte_length() : buffer_size;
+        // std::string_view型
+        else if constexpr (std::is_same<T, std::string_view>::value) {
+            auto view_size = static_cast<uint32_t>(value.size());
+            uint32_t len = (view_size < buffer_size) ? view_size : buffer_size;
+
             for (uint32_t i = 0; i < len; ++i) {
                 buffer[i] = value[i];
             }
+
             return len;
         }
         // その他の型（未対応）
@@ -493,14 +495,16 @@ struct formatter {
  * @brief 再帰終了
  */
 template <uint32_t Capacity>
-void format_impl(FixedString<Capacity>& result, StringView format_str, uint32_t&) noexcept {
+void format_impl(FixedString<Capacity>& result, std::string_view format_str, uint32_t&) noexcept {
     // 残りの文字列を追加
     uint32_t pos = 0;
-    while (pos < format_str.byte_length()) {
-        if (format_str[pos] == '{' && pos + 1 < format_str.byte_length() && format_str[pos + 1] == '{') {
+    auto format_len = static_cast<uint32_t>(format_str.size());
+
+    while (pos < format_len) {
+        if (format_str[pos] == '{' && pos + 1 < format_len && format_str[pos + 1] == '{') {
             result.append('{');
             pos += 2;
-        } else if (format_str[pos] == '}' && pos + 1 < format_str.byte_length() && format_str[pos + 1] == '}') {
+        } else if (format_str[pos] == '}' && pos + 1 < format_len && format_str[pos + 1] == '}') {
             result.append('}');
             pos += 2;
         } else {
@@ -514,33 +518,39 @@ void format_impl(FixedString<Capacity>& result, StringView format_str, uint32_t&
  * @brief フォーマット実装（可変長引数）
  */
 template <uint32_t Capacity, typename T, typename... Args>
-void format_impl(FixedString<Capacity>& result, StringView format_str, uint32_t& arg_index, T&& value, Args&&... args) noexcept {
+void format_impl(FixedString<Capacity>& result, std::string_view format_str, uint32_t& arg_index, T&& value, Args&&... args) noexcept {
     // フォーマット文字列を解析
     uint32_t pos = 0;
-    while (pos < format_str.byte_length()) {
+    auto format_len = static_cast<uint32_t>(format_str.size());
+
+    while (pos < format_len) {
         // プレースホルダー検索
         if (format_str[pos] == '{') {
-            if (pos + 1 < format_str.byte_length() && format_str[pos + 1] == '}') {
+            if (pos + 1 < format_len && format_str[pos + 1] == '}') {
                 // 現在の引数を変換
                 char buffer[64] = {};
                 uint32_t len = formatter<typename remove_cv_ref<T>::type>::to_string(value, buffer, sizeof(buffer));
+
                 if (len > 0) {
-                    result.append(StringView(buffer, len));
+                    result.append(std::string_view(buffer, len));
                 }
 
                 // 次の引数へ
                 ++arg_index;
-                format_impl(result, StringView(format_str.data() + pos + 2, format_str.byte_length() - pos - 2), arg_index, args...);
+                format_impl(result, std::string_view(format_str.data() + pos + 2, format_len - pos - 2), arg_index, args...);
+
                 return;
             }
-            if (pos + 1 < format_str.byte_length() && format_str[pos + 1] == '{') {
+
+            if (pos + 1 < format_len && format_str[pos + 1] == '{') {
                 // エスケープされた '{{' → '{'
                 result.append('{');
                 pos += 2;
                 continue;
             }
         }
-        if (format_str[pos] == '}' && pos + 1 < format_str.byte_length() && format_str[pos + 1] == '}') {
+
+        if (format_str[pos] == '}' && pos + 1 < format_len && format_str[pos + 1] == '}') {
             // エスケープされた '}}' → '}'
             result.append('}');
             pos += 2;
@@ -616,12 +626,12 @@ constexpr auto format(const char (&format_str)[N], Args&&... args) noexcept -> F
 }
 
 /**
- * @brief 文字列フォーマット（StringView版、互換性維持）
+ * @brief 文字列フォーマット（std::string_view版、互換性維持）
  *
- * 実行時に構築されたStringViewから使用
+ * 実行時に構築されたstd::string_viewから使用
  */
 template <uint32_t Capacity, typename... Args>
-constexpr FixedString<Capacity> format(StringView format_str, Args&&... args) noexcept {
+constexpr FixedString<Capacity> format(std::string_view format_str, Args&&... args) noexcept {
     return format<Capacity>(basic_format_string<Args...>(format_str), args...);
 }
 
@@ -636,7 +646,7 @@ FixedString<Capacity> format_hex(T value, bool uppercase = false) noexcept {
     char buffer[32] = {};
     uint32_t len = detail::hex_to_string(value, buffer, sizeof(buffer), uppercase);
     if (len > 0) {
-        result.append(StringView(buffer, len));
+        result.append(std::string_view(buffer, len));
     }
 
     return result;
@@ -704,12 +714,12 @@ constexpr auto format_to(const char (&format_str)[N], Args&&... args) noexcept -
 }
 
 /**
- * @brief 文字列フォーマット（StringView版、互換性維持）
+ * @brief 文字列フォーマット（std::string_view版、互換性維持）
  *
- * 実行時に構築されたStringViewから使用
+ * 実行時に構築されたstd::string_viewから使用
  */
 template <uint32_t N, typename... Args>
-constexpr bool format_to(FixedString<N>& result, StringView format_str, Args&&... args) noexcept {
+constexpr bool format_to(FixedString<N>& result, std::string_view format_str, Args&&... args) noexcept {
     return format_to(result, basic_format_string<Args...>(format_str), args...);
 }
 
@@ -724,7 +734,7 @@ bool format_hex_to(FixedString<N>& result, T value, bool uppercase = false) noex
     char buffer[32] = {};
     uint32_t len = detail::hex_to_string(value, buffer, sizeof(buffer), uppercase);
     if (len > 0) {
-        result.append(StringView(buffer, len));
+        result.append(std::string_view(buffer, len));
     }
 
     return true;
@@ -768,12 +778,12 @@ constexpr FixedString<256> fmt(const char (&format_str)[N], Args&&... args) noex
 }
 
 /**
- * @brief デフォルト容量256のフォーマット関数（StringView版、互換性維持）
+ * @brief デフォルト容量256のフォーマット関数（std::string_view版、互換性維持）
  *
- * 実行時に構築されたStringViewから使用
+ * 実行時に構築されたstd::string_viewから使用
  */
 template <typename... Args>
-constexpr FixedString<256> fmt(StringView format_str, Args&&... args) noexcept {
+constexpr FixedString<256> fmt(std::string_view format_str, Args&&... args) noexcept {
     return format<256>(basic_format_string<Args...>(format_str), args...);
 }
 

@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Core types
-  - `StringView` - UTF-8文字列ビュー
+  - `std::string_view` UTF-8ヘルパー関数
   - `FixedString<N>` - 固定長文字列
   - `FixedBuffer<N>` - 固定長バッファ
   - `span<T>` - メモリビュー
