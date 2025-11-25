@@ -3,7 +3,6 @@
 #include <omusubi/core/types.h>
 
 #include <cassert>
-#include <new>
 
 namespace omusubi {
 
@@ -174,13 +173,13 @@ public:
      * @brief 成功かどうかを判定
      * @return 成功の場合true
      */
-    constexpr bool is_ok() const noexcept { return is_ok_; }
+    [[nodiscard]] constexpr bool is_ok() const noexcept { return is_ok_; }
 
     /**
      * @brief エラーかどうかを判定
      * @return エラーの場合true
      */
-    constexpr bool is_err() const noexcept { return !is_ok_; }
+    [[nodiscard]] constexpr bool is_err() const noexcept { return !is_ok_; }
 
     /**
      * @brief 成功時の値を取得（参照）

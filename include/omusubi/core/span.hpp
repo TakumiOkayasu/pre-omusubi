@@ -41,51 +41,51 @@ public:
     constexpr span(span&&) noexcept = default;
     constexpr span& operator=(span&&) noexcept = default;
 
-    constexpr pointer data() const noexcept { return data_; }
+    [[nodiscard]] constexpr pointer data() const noexcept { return data_; }
 
-    constexpr size_type size() const noexcept { return size_; }
+    [[nodiscard]] constexpr size_type size() const noexcept { return size_; }
 
-    constexpr size_type size_bytes() const noexcept { return size_ * sizeof(T); }
+    [[nodiscard]] constexpr size_type size_bytes() const noexcept { return size_ * sizeof(T); }
 
-    constexpr bool empty() const noexcept { return size_ == 0; }
+    [[nodiscard]] constexpr bool empty() const noexcept { return size_ == 0; }
 
-    constexpr reference operator[](size_type index) const noexcept { return data_[index]; }
+    [[nodiscard]] constexpr reference operator[](size_type index) const noexcept { return data_[index]; }
 
-    constexpr reference front() const noexcept { return data_[0]; }
+    [[nodiscard]] constexpr reference front() const noexcept { return data_[0]; }
 
-    constexpr reference back() const noexcept { return data_[size_ - 1]; }
+    [[nodiscard]] constexpr reference back() const noexcept { return data_[size_ - 1]; }
 
-    constexpr iterator begin() const noexcept { return data_; }
+    [[nodiscard]] constexpr iterator begin() const noexcept { return data_; }
 
-    constexpr iterator end() const noexcept { return data_ + size_; }
+    [[nodiscard]] constexpr iterator end() const noexcept { return data_ + size_; }
 
-    constexpr const_iterator cbegin() const noexcept { return data_; }
+    [[nodiscard]] constexpr const_iterator cbegin() const noexcept { return data_; }
 
-    constexpr const_iterator cend() const noexcept { return data_ + size_; }
+    [[nodiscard]] constexpr const_iterator cend() const noexcept { return data_ + size_; }
 
-    constexpr span<T> subspan(size_type offset, size_type count) const noexcept { return span<T>(data_ + offset, count); }
+    [[nodiscard]] constexpr span<T> subspan(size_type offset, size_type count) const noexcept { return span<T>(data_ + offset, count); }
 
-    constexpr span<T> first(size_type count) const noexcept { return span<T>(data_, count); }
+    [[nodiscard]] constexpr span<T> first(size_type count) const noexcept { return span<T>(data_, count); }
 
-    constexpr span<T> last(size_type count) const noexcept { return span<T>(data_ + size_ - count, count); }
+    [[nodiscard]] constexpr span<T> last(size_type count) const noexcept { return span<T>(data_ + size_ - count, count); }
 };
 
-constexpr span<uint8_t> as_bytes(span<char> s) noexcept {
+[[nodiscard]] constexpr span<uint8_t> as_bytes(span<char> s) noexcept {
     // NOLINT(bugprone-casting-through-void)
     return {static_cast<uint8_t*>(static_cast<void*>(s.data())), s.size()};
 }
 
-constexpr span<const uint8_t> as_bytes(span<const char> s) noexcept {
+[[nodiscard]] constexpr span<const uint8_t> as_bytes(span<const char> s) noexcept {
     // NOLINT(bugprone-casting-through-void)
     return {static_cast<const uint8_t*>(static_cast<const void*>(s.data())), s.size()};
 }
 
-constexpr span<char> as_chars(span<uint8_t> s) noexcept {
+[[nodiscard]] constexpr span<char> as_chars(span<uint8_t> s) noexcept {
     // NOLINT(bugprone-casting-through-void)
     return {static_cast<char*>(static_cast<void*>(s.data())), s.size()};
 }
 
-constexpr span<const char> as_chars(span<const uint8_t> s) noexcept {
+[[nodiscard]] constexpr span<const char> as_chars(span<const uint8_t> s) noexcept {
     // NOLINT(bugprone-casting-through-void)
     return {static_cast<const char*>(static_cast<const void*>(s.data())), s.size()};
 }

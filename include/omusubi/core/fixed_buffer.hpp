@@ -20,22 +20,22 @@ public:
     /**
      * @brief 容量を取得
      */
-    constexpr uint32_t capacity() const noexcept { return Capacity; }
+    [[nodiscard]] constexpr uint32_t capacity() const noexcept { return Capacity; }
 
     /**
      * @brief サイズを取得
      */
-    uint32_t size() const noexcept { return length_; }
+    [[nodiscard]] uint32_t size() const noexcept { return length_; }
 
     /**
      * @brief 空か判定
      */
-    bool is_empty() const noexcept { return length_ == 0; }
+    [[nodiscard]] bool is_empty() const noexcept { return length_ == 0; }
 
     /**
      * @brief データへのポインタを取得
      */
-    const uint8_t* data() const noexcept { return buffer_; }
+    [[nodiscard]] const uint8_t* data() const noexcept { return buffer_; }
 
     /**
      * @brief 1バイト追加
@@ -62,22 +62,22 @@ public:
     /**
      * @brief イテレータ（開始）
      */
-    const uint8_t* begin() const noexcept { return buffer_; }
+    [[nodiscard]] const uint8_t* begin() const noexcept { return buffer_; }
 
     /**
      * @brief イテレータ（終了）
      */
-    const uint8_t* end() const noexcept { return buffer_ + length_; }
+    [[nodiscard]] const uint8_t* end() const noexcept { return buffer_ + length_; }
 
     /**
      * @brief spanとして取得（書き込み可能）
      */
-    span<uint8_t> as_span() noexcept { return span<uint8_t>(buffer_, length_); }
+    [[nodiscard]] span<uint8_t> as_span() noexcept { return span<uint8_t>(buffer_, length_); }
 
     /**
      * @brief spanとして取得（読み取り専用）
      */
-    span<const uint8_t> as_span() const noexcept { return span<const uint8_t>(buffer_, length_); }
+    [[nodiscard]] span<const uint8_t> as_span() const noexcept { return span<const uint8_t>(buffer_, length_); }
 
     /**
      * @brief spanから構築

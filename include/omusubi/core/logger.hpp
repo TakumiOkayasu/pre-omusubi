@@ -78,7 +78,7 @@ public:
      * @brief 現在の最小ログレベルを取得
      * @return 最小ログレベル
      */
-    constexpr LogLevel get_min_level() const noexcept { return min_level_; }
+    [[nodiscard]] constexpr LogLevel get_min_level() const noexcept { return min_level_; }
 
     /**
      * @brief 出力をフラッシュ
@@ -95,20 +95,20 @@ public:
  * @param level ログレベル
  * @return ログレベル文字列
  */
-constexpr std::string_view log_level_to_string(LogLevel level) noexcept {
+[[nodiscard]] constexpr std::string_view log_level_to_string(LogLevel level) noexcept {
     switch (level) {
         case LogLevel::DEBUG:
-            return std::string_view("DEBUG", 5);
+            return {"DEBUG", 5};
         case LogLevel::INFO:
-            return std::string_view("INFO", 4);
+            return {"INFO", 4};
         case LogLevel::WARNING:
-            return std::string_view("WARN", 4);
+            return {"WARN", 4};
         case LogLevel::ERROR:
-            return std::string_view("ERROR", 5);
+            return {"ERROR", 5};
         case LogLevel::CRITICAL:
-            return std::string_view("CRIT", 4);
+            return {"CRIT", 4};
     }
-    return std::string_view("UNKNOWN", 7);
+    return {"UNKNOWN", 7};
 }
 
 /**

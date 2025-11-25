@@ -108,17 +108,17 @@ public:
     /**
      * @brief C文字列として取得
      */
-    constexpr const char* c_str() const noexcept { return str_; }
+    [[nodiscard]] constexpr const char* c_str() const noexcept { return str_; }
 
     /**
      * @brief std::string_viewとして取得
      */
-    constexpr std::string_view view() const noexcept { return {str_, length_}; }
+    [[nodiscard]] constexpr std::string_view view() const noexcept { return {str_, length_}; }
 
     /**
      * @brief 長さを取得
      */
-    constexpr uint32_t length() const noexcept { return length_; }
+    [[nodiscard]] constexpr uint32_t length() const noexcept { return length_; }
 
     /**
      * @brief 引数数を取得（コンパイル時定数）
@@ -291,10 +291,14 @@ struct calculate_capacity {
 template <typename T>
 constexpr uint32_t integer_to_string(T value, char* buffer, uint32_t buffer_size) noexcept {
     // 負数処理（符号付き型のみ）
-    bool is_negative = false;
-    if constexpr (std::is_signed<T>::value) {
-        if (value < 0) {
-            is_negative = true;
+    const bool is_negative = [&]() {
+        if constexpr (std::is_signed_v<T>) {
+            return value < 0;
+        }
+        return false;
+    }();
+    if constexpr (std::is_signed_v<T>) {
+        if (is_negative) {
             value = -value;
         }
     }
@@ -314,7 +318,7 @@ constexpr uint32_t integer_to_string(T value, char* buffer, uint32_t buffer_size
     }
 
     // 負号を追加（符号付き型のみ）
-    if constexpr (std::is_signed<T>::value) {
+    if constexpr (std::is_signed_v<T>) {
         if (is_negative && pos < buffer_size) {
             buffer[pos++] = '-';
         }
@@ -322,7 +326,7 @@ constexpr uint32_t integer_to_string(T value, char* buffer, uint32_t buffer_size
 
     // 反転
     for (uint32_t i = 0; i < pos / 2; ++i) {
-        char tmp = buffer[i];
+        const char tmp = buffer[i];
         buffer[i] = buffer[pos - 1 - i];
         buffer[pos - 1 - i] = tmp;
     }
@@ -361,7 +365,7 @@ constexpr uint32_t hex_to_string(T value, char* buffer, uint32_t buffer_size, bo
 
         // 反転
         for (uint32_t i = 0; i < pos / 2; ++i) {
-            char tmp = buffer[i];
+            const char tmp = buffer[i];
             buffer[i] = buffer[pos - 1 - i];
             buffer[pos - 1 - i] = tmp;
         }
@@ -420,19 +424,19 @@ template <typename T>
 struct formatter {
     static constexpr uint32_t to_string(T value, char* buffer, uint32_t buffer_size) noexcept {
         // 符号付き整数型
-        if constexpr (std::is_same<T, int8_t>::value || std::is_same<T, int16_t>::value) {
+        if constexpr (std::is_same_v<T, int8_t> || std::is_same_v<T, int16_t>) {
             return integer_to_string(static_cast<int32_t>(value), buffer, buffer_size);
-        } else if constexpr (std::is_same<T, int32_t>::value || std::is_same<T, int64_t>::value) {
+        } else if constexpr (std::is_same_v<T, int32_t> || std::is_same_v<T, int64_t>) {
             return integer_to_string(value, buffer, buffer_size);
         }
         // 符号なし整数型
-        else if constexpr (std::is_same<T, uint8_t>::value || std::is_same<T, uint16_t>::value) {
+        else if constexpr (std::is_same_v<T, uint8_t> || std::is_same_v<T, uint16_t>) {
             return unsigned_to_string(static_cast<uint32_t>(value), buffer, buffer_size);
-        } else if constexpr (std::is_same<T, uint32_t>::value || std::is_same<T, uint64_t>::value) {
+        } else if constexpr (std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>) {
             return unsigned_to_string(value, buffer, buffer_size);
         }
         // bool型
-        else if constexpr (std::is_same<T, bool>::value) {
+        else if constexpr (std::is_same_v<T, bool>) {
             if (value) {
                 if (buffer_size < 4) {
                     return 0;
@@ -454,7 +458,7 @@ struct formatter {
             return 5;
         }
         // char型
-        else if constexpr (std::is_same<T, char>::value) {
+        else if constexpr (std::is_same_v<T, char>) {
             if (buffer_size < 1) {
                 return 0;
             }
@@ -462,7 +466,7 @@ struct formatter {
             return 1;
         }
         // const char*型
-        else if constexpr (std::is_same<T, const char*>::value) {
+        else if constexpr (std::is_same_v<T, const char*>) {
             if (value == nullptr) {
                 return 0;
             }
@@ -474,9 +478,9 @@ struct formatter {
             return pos;
         }
         // std::string_view型
-        else if constexpr (std::is_same<T, std::string_view>::value) {
-            auto view_size = static_cast<uint32_t>(value.size());
-            uint32_t len = (view_size < buffer_size) ? view_size : buffer_size;
+        else if constexpr (std::is_same_v<T, std::string_view>) {
+            const auto view_size = static_cast<uint32_t>(value.size());
+            const uint32_t len = (view_size < buffer_size) ? view_size : buffer_size;
 
             for (uint32_t i = 0; i < len; ++i) {
                 buffer[i] = value[i];
@@ -495,7 +499,7 @@ struct formatter {
  * @brief 再帰終了
  */
 template <uint32_t Capacity>
-void format_impl(FixedString<Capacity>& result, std::string_view format_str, uint32_t&) noexcept {
+void format_impl(FixedString<Capacity>& result, std::string_view format_str, uint32_t& /*arg_index*/) noexcept {
     // 残りの文字列を追加
     uint32_t pos = 0;
     auto format_len = static_cast<uint32_t>(format_str.size());
