@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Header dependency issues (missing `<cstdint>` includes)
 - Code formatting consistency across all files
 
-## [0.1.0] - 2025-01-XX (Initial Release)
+## [0.1.0] - 2025-11-25 (Initial Release)
 
 ### Added
 - Core types
@@ -76,5 +76,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DEVELOPMENT.md - 開発ガイド
 - CLAUDE.md - AI開発支援向けガイドライン
 
-[Unreleased]: https://github.com/your-org/omusubi/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/your-org/omusubi/releases/tag/v0.1.0
+[Unreleased]: https://github.com/TakumiOkayasu/omusubi/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/TakumiOkayasu/omusubi/releases/tag/v0.1.0

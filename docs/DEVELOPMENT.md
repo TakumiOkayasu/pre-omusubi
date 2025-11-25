@@ -165,7 +165,7 @@ chmod +x .git/hooks/pre-commit
 ## 関連ドキュメント
 
 - [Code Quality Tools](code-quality.md) - clang-format/clang-tidyの詳細
-- [C++17機能ガイド](cpp17_features.md) - C++17機能の活用
+- [C++17機能ガイド](cpp17-features.md) - C++17機能の活用
 - [CLAUDE.md](../CLAUDE.md) - コーディング規約全般
 
 ---

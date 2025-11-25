@@ -118,14 +118,14 @@ endif
 
 ```makefile
 # Test configuration with doctest
-TEST_DIR = test
+TEST_DIR = tests
 BIN_DIR = bin
 
-# Tests in test/core/ directory
+# Tests in tests/core/ directory
 CORE_TESTS = test_result test_logger
 CORE_TEST_BINS = $(patsubst %,$(BIN_DIR)/%,$(CORE_TESTS))
 
-# Tests in test/ directory
+# Tests in tests/ directory
 BASIC_TESTS = test_auto_capacity test_format test_format_string test_fixed_string test_fixed_buffer test_span test_string_view test_vector3
 BASIC_TEST_BINS = $(patsubst %,$(BIN_DIR)/%,$(BASIC_TESTS))
 
@@ -135,7 +135,7 @@ ALL_TEST_BINS = $(CORE_TEST_BINS) $(BASIC_TEST_BINS)
 # Build all tests
 tests: $(ALL_TEST_BINS)
 
-# Build tests in test/ directory
+# Build tests in tests/ directory
 $(BIN_DIR)/test_%: $(TEST_DIR)/test_%.cpp $(TEST_DIR)/doctest.h $(HEADERS)
 	@mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -o $@ $<
@@ -242,7 +242,7 @@ omusubi/
 │       ├── m5stack/   # M5Stack実装
 │       ├── arduino/   # Arduino実装
 │       └── pico/      # Raspberry Pi Pico実装
-├── test/              # テストコード
+├── tests/             # テストコード
 ├── examples/          # サンプルコード
 ├── docs/              # ドキュメント
 ├── obj/               # オブジェクトファイル (生成)

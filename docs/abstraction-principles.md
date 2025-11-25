@@ -542,7 +542,7 @@ public:
 
 - [ハードウェア抽象化ガイド](hardware-abstraction.md) - ハードウェア固有の抽象化戦略
 - [アーキテクチャガイド](architecture.md) - 5層アーキテクチャの詳細
-- [C++14互換性ガイド](cpp17_features.md) - 使用可能なC++機能
+- [C++17機能ガイド](cpp17-features.md) - 使用可能なC++機能
 - CLAUDE.md - コーディング規約全般
 
 ---

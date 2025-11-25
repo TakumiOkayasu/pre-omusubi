@@ -80,14 +80,14 @@ omusubi/
    ```ini
    [env:m5stack]
    lib_deps =
-       https://github.com/your-org/omusubi.git
+       https://github.com/TakumiOkayasu/omusubi.git
    ```
 
    **変更後:**
    ```ini
    [env:m5stack]
    lib_deps =
-       https://github.com/your-org/omusubi.git#platforms/m5stack
+       https://github.com/TakumiOkayasu/omusubi.git#platforms/m5stack
    ```
 
 2. **ビルドフラグ（手動でインクルードパスを指定していた場合）**
@@ -128,7 +128,7 @@ omusubi/
    framework = arduino
 
    lib_deps =
-       https://github.com/your-org/omusubi.git#platforms/m5stack
+       https://github.com/TakumiOkayasu/omusubi.git#platforms/m5stack
 
    build_flags =
        -std=c++14
@@ -220,7 +220,7 @@ platforms/
 ```ini
 ; platformio.iniに以下を追加
 lib_deps =
-    https://github.com/your-org/omusubi.git#platforms/m5stack
+    https://github.com/TakumiOkayasu/omusubi.git#platforms/m5stack
 ```
 
 ### 既存のサンプルコードが動かない
@@ -257,7 +257,7 @@ lib_deps =
 
 質問や問題がある場合は、以下のリソースを参照してください:
 
-- [GitHub Issues](https://github.com/your-org/omusubi/issues)
+- [GitHub Issues](https://github.com/TakumiOkayasu/omusubi/issues)
 - [プラットフォームサポート](platform-support.md)
 - [アーキテクチャドキュメント](architecture.md)
 

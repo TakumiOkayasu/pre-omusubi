@@ -363,7 +363,7 @@ Checks: >
 ## 関連ドキュメント
 
 - [開発ガイド](DEVELOPMENT.md) - コード品質管理の実践ガイド
-- [C++17機能ガイド](cpp17_features.md) - C++17機能の活用
+- [C++17機能ガイド](cpp17-features.md) - C++17機能の活用
 - [CLAUDE.md](../CLAUDE.md) - 命名規則とコーディング規約
 
 ## 参考資料

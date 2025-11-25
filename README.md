@@ -37,7 +37,7 @@ omusubi/                      # プラットフォーム非依存のコアライ
 │   ├── omusubi.h            # 統合ヘッダー
 │   └── system_context.h     # SystemContext定義
 ├── examples/                 # サンプルコード（コア機能デモ）
-├── test/                     # ユニットテスト
+├── tests/                    # ユニットテスト
 ├── docs/                     # ドキュメント
 ├── scripts/                  # ビルド/品質管理スクリプト
 └── bin/                      # ビルド成果物

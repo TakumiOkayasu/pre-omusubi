@@ -66,14 +66,14 @@ curl -L https://raw.githubusercontent.com/doctest/doctest/master/doctest/doctest
 1. Dockerfile downloads latest doctest from GitHub releases
 2. Falls back to master branch if release API fails
 3. Installed to `/usr/local/include/doctest/` during setup
-4. Copied to workspace `test/` directory on container creation
+4. Copied to workspace `tests/` directory on container creation
 
 ### Writing Tests
 
 ```cpp
 #define DOCTEST_CONFIG_NO_EXCEPTIONS
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest.h"  // or "../doctest.h" for test/core/
+#include "doctest.h"  // or "../doctest.h" for tests/core/
 
 #include <omusubi/omusubi.h>
 
@@ -96,8 +96,8 @@ TEST_CASE("Component - feature description") {
 ### Test Organization
 
 **Test Structure:**
-- `test/` - Basic component tests (FixedString, span, format, etc.)
-- `test/core/` - Core library tests (Result, Logger)
+- `tests/` - Basic component tests (FixedString, span, format, etc.)
+- `tests/core/` - Core library tests (Result, Logger)
 - Use `TEST_CASE()` for main test categories
 - Use `SUBCASE()` to group related test scenarios
 
@@ -277,7 +277,7 @@ Use hierarchical when:
 - Sub-components: `BLECharacteristic`, `BLEService`, etc.
 - Use domain terminology, NOT `*Context` suffix
 
-**5. Platform Layer** (`include/omusubi/platform/`, `src/platform/`)
+**5. Platform Layer** (`include/omusubi/platform/`, `src/platform/`) ※将来実装予定
 - Platform-specific implementations: `M5StackSystemContext`, `M5StackConnectableContext`, etc.
 - Pattern: Contexts own devices as members
 - `get_system_context()` implemented as Meyers Singleton in platform `.cpp`

@@ -14,9 +14,9 @@
 
 | プラットフォーム | 優先度 | 予定時期 | 備考 |
 |------------------|--------|----------|------|
-| Arduino | 高 | TBD | ESP32, ESP8266を優先 |
-| Raspberry Pi Pico | 中 | TBD | RP2040対応 |
-| STM32 | 低 | TBD | 要リクエスト |
+| Arduino | 高 | 未定 | ESP32, ESP8266を優先 |
+| Raspberry Pi Pico | 中 | 未定 | RP2040対応 |
+| STM32 | 低 | 未定 | 要リクエスト |
 
 ## M5Stack
 
@@ -348,7 +348,7 @@ target_link_libraries(omusubi_pico pico_stdlib)
 - [Architecture - 新しいプラットフォームの追加](architecture.md#新しいプラットフォームの追加)
 - [Contributing](contributing.md)
 
-または、[GitHub Issues](https://github.com/your-org/omusubi/issues)でリクエストを作成してください。
+または、[GitHub Issues](https://github.com/TakumiOkayasu/omusubi/issues)でリクエストを作成してください。
 
 ## プラットフォーム比較表
 
@@ -393,7 +393,7 @@ target_link_libraries(omusubi_pico pico_stdlib)
 
 ## サポートリクエスト
 
-新しいプラットフォームのサポートをリクエストする場合は、以下の情報を含めて[GitHub Issues](https://github.com/your-org/omusubi/issues)に投稿してください：
+新しいプラットフォームのサポートをリクエストする場合は、以下の情報を含めて[GitHub Issues](https://github.com/TakumiOkayasu/omusubi/issues)に投稿してください：
 
 **必須情報:**
 - プラットフォーム名とバージョン

@@ -17,7 +17,7 @@
 
 **Omusubiフレームワークのコア部分は外部ライブラリに依存していません。**
 
-- 標準C++のみ使用（C++14）
+- 標準C++のみ使用（C++17）
 - すべてのコア機能は自作実装
 - ライセンス制約なし
 - 商用利用完全自由
@@ -90,7 +90,7 @@ Omusubiは以下の2層構造により依存関係を分離しています：
 
 ### M5Stack実装の依存関係
 
-M5Stack向け実装（`src/platform/m5stack/`）は以下のライブラリに依存します：
+M5Stack向け実装（将来実装予定）は以下のライブラリに依存する予定です：
 
 #### 1. M5Stack Library
 
@@ -222,7 +222,7 @@ auto* bt = ctx.get_connectable_context()->get_bluetooth_context();
 This product uses the following open source software:
 
 Omusubi Framework
-Copyright (c) [Year] [Your Name/Organization]
+Copyright (c) 2025 TakumiOkayasu
 Licensed under the MIT License / Apache License 2.0
 
 M5Stack Library
@@ -242,10 +242,10 @@ https://github.com/espressif/arduino-esp32
 
 ```
 This product uses the Omusubi Framework
-Copyright (c) [Year] [Your Name/Organization]
+Copyright (c) 2025 TakumiOkayasu
 
 Omusubi core components have no external dependencies
-and use only standard C++14 features.
+and use only standard C++17 features.
 ```
 
 ---
@@ -311,11 +311,11 @@ and use only standard C++14 features.
 
 ## 関連ドキュメント
 
-- [C++14互換性ガイド](cpp17_features.md) - 使用している言語機能
+- [C++17機能ガイド](cpp17-features.md) - 使用している言語機能
 - [アーキテクチャガイド](architecture.md) - 依存関係の設計思想
 - CLAUDE.md - コーディング規約とプロジェクト方針
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-17
+**Version:** 1.0.1
+**Last Updated:** 2025-11-25

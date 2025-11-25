@@ -203,9 +203,11 @@ BLECharacteristicContext         // 間違い
 BLEServiceContext                // 間違い
 ```
 
-### 5. Platform Layer (`include/omusubi/platform/`, `src/platform/`)
+### 5. Platform Layer (`include/omusubi/platform/`, `src/platform/`) ※将来実装予定
 
 **責務:** プラットフォーム固有の実装
+
+> **注意:** 現時点では Platform Layer は未実装です。以下はアーキテクチャ設計のガイドラインです。
 
 **実装パターン:**
 

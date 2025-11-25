@@ -52,7 +52,7 @@ compile_commands.json
 
 ### Testing Framework ###
 # doctest is auto-downloaded during Docker build
-test/doctest.h
+tests/doctest.h
 
 ### Linux ###
 *~

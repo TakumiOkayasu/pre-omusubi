@@ -139,7 +139,7 @@ auto retry_count = 0;  // int (意図と異なる可能性)
 - `auto`では意図しない型になる可能性
 
 > **詳細な型選択ガイドライン:**
-> `uint32_t` vs `size_t`の選択基準、サフィックスの使い分け、ラッパー関数の削除理由などは、[型システムの統一](type_system_unification.md)を参照してください。
+> `uint32_t` vs `size_t`の選択基準、サフィックスの使い分け、ラッパー関数の削除理由などは、[型システムの統一](type-system-unification.md)を参照してください。
 
 ### ✅ **リテラルで型が自明な場合 - `auto`推奨**
 
@@ -656,7 +656,7 @@ return std::move(local_var);  // RVOを妨げる可能性
 
 ## 関連ドキュメント
 
-- [型システムの統一](type_system_unification.md) - `uint32_t` vs `size_t`の使い分けルール
+- [型システムの統一](type-system-unification.md) - `uint32_t` vs `size_t`の使い分けルール
 - CLAUDE.md - コーディング規約全般
 
 ---

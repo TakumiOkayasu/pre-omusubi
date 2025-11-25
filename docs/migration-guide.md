@@ -9,7 +9,7 @@
 
 ## v0.1.x → v0.2.x（予定）
 
-**リリース予定:** TBD
+**リリース予定:** 未定
 
 ### 破壊的変更
 
@@ -240,9 +240,9 @@ namespace omusubi {
 
 | Omusubiバージョン | 対応プラットフォーム | C++標準 | 推奨コンパイラ |
 |------------------|---------------------|---------|---------------|
-| 0.1.x | M5Stack | C++14 | Clang 10+, GCC 7+ |
-| 0.2.x (予定) | M5Stack, Arduino | C++14 | Clang 10+, GCC 7+ |
-| 1.0.x (予定) | M5Stack, Arduino, Pico | C++14 | Clang 11+, GCC 8+ |
+| 0.1.x | M5Stack | C++17 | Clang 10+, GCC 7+ |
+| 0.2.x (予定) | M5Stack, Arduino | C++17 | Clang 10+, GCC 7+ |
+| 1.0.x (予定) | M5Stack, Arduino, Pico | C++17 | Clang 11+, GCC 8+ |
 
 ## サポートポリシー
 
@@ -263,13 +263,13 @@ namespace omusubi {
 移行で問題が発生した場合：
 
 1. **ドキュメントを確認:** [API Reference](api-reference.md), [Architecture](architecture.md)
-2. **既知の問題を確認:** [GitHub Issues](https://github.com/your-org/omusubi/issues)
-3. **質問する:** [GitHub Discussions](https://github.com/your-org/omusubi/discussions)
-4. **バグ報告:** [GitHub Issues](https://github.com/your-org/omusubi/issues/new)
+2. **既知の問題を確認:** [GitHub Issues](https://github.com/TakumiOkayasu/omusubi/issues)
+3. **質問する:** [GitHub Discussions](https://github.com/TakumiOkayasu/omusubi/discussions)
+4. **バグ報告:** [GitHub Issues](https://github.com/TakumiOkayasu/omusubi/issues/new)
 
 ## フィードバック
 
-このマイグレーションガイドの改善提案は、[GitHub Issues](https://github.com/your-org/omusubi/issues)または[Discussions](https://github.com/your-org/omusubi/discussions)でお待ちしています。
+このマイグレーションガイドの改善提案は、[GitHub Issues](https://github.com/TakumiOkayasu/omusubi/issues)または[Discussions](https://github.com/TakumiOkayasu/omusubi/discussions)でお待ちしています。
 
 ---
 

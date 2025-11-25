@@ -27,7 +27,7 @@ Omusubiプロジェクトへの貢献を歓迎します。このドキュメン�
 1. **リポジトリのクローン**
 
 ```bash
-git clone https://github.com/your-org/omusubi.git
+git clone https://github.com/TakumiOkayasu/omusubi.git
 cd omusubi
 ```
 
@@ -633,9 +633,9 @@ CHANGELOG.md                 # 変更履歴
 
 ## 質問とサポート
 
-- **バグ報告:** [GitHub Issues](https://github.com/your-org/omusubi/issues)
-- **機能リクエスト:** [GitHub Issues](https://github.com/your-org/omusubi/issues)
-- **質問・議論:** [GitHub Discussions](https://github.com/your-org/omusubi/discussions)
+- **バグ報告:** [GitHub Issues](https://github.com/TakumiOkayasu/omusubi/issues)
+- **機能リクエスト:** [GitHub Issues](https://github.com/TakumiOkayasu/omusubi/issues)
+- **質問・議論:** [GitHub Discussions](https://github.com/TakumiOkayasu/omusubi/discussions)
 
 ## ライセンス
 

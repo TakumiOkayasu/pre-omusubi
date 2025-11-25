@@ -4,7 +4,7 @@
 
 ## テスト対象コンポーネント
 
-### 基本型テスト（`test/`）
+### 基本型テスト（`tests/`）
 
 | テストファイル | 対象 | 説明 |
 |---------------|------|------|
@@ -17,7 +17,7 @@
 | `test_format_string.cpp` | `FormatString` | フォーマット文字列パーサー |
 | `test_auto_capacity.cpp` | `AutoCapacity` | 自動容量計算ユーティリティ |
 
-### コアライブラリテスト（`test/core/`）
+### コアライブラリテスト（`tests/core/`）
 
 | テストファイル | 対象 | 説明 |
 |---------------|------|------|
@@ -57,7 +57,7 @@ make clean-tests
 **doctest** を使用しています。高速で軽量なヘッダーオンリーのC++テストフレームワークです。
 
 **特徴:**
-- ヘッダーオンリー（単一ファイル `test/doctest.h`）
+- ヘッダーオンリー（単一ファイル `tests/doctest.h`）
 - 例外なしモード対応（`DOCTEST_CONFIG_NO_EXCEPTIONS`）
 - 高速コンパイル
 - 豊富なアサーションマクロ
@@ -99,7 +99,7 @@ All tests passed successfully!
 
 新しいテストを追加する場合：
 
-1. `test/test_*.cpp` という名前でテストファイルを作成
+1. `tests/test_*.cpp` という名前でテストファイルを作成
 2. doctestのヘッダとコンポーネントをインクルード:
    ```cpp
    #define DOCTEST_CONFIG_NO_EXCEPTIONS
@@ -120,7 +120,7 @@ All tests passed successfully!
 ## ディレクトリ構造
 
 ```
-test/
+tests/
 ├── doctest.h              # doctestフレームワーク（自動ダウンロード）
 ├── README.md              # このファイル
 ├── Makefile               # レガシーMakefile（非推奨）

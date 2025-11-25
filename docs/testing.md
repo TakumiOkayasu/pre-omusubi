@@ -209,7 +209,7 @@ TEST_CASE("FixedString - 容量管理") {
 **`test_[対象].cpp` の形式:**
 
 ```
-test/
+tests/
 ├── test_span.cpp           # span<T>のテスト
 ├── test_string_view.cpp    # StringViewのテスト
 ├── test_fixed_string.cpp   # FixedString<N>のテスト

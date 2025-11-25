@@ -132,7 +132,7 @@ size_t fwrite(const void* ptr, size_t size, size_t nmemb, FILE* stream);
 | I/O操作の戻り値 | `size_t` | 標準API互換性 |
 | ハードウェアAPIラッパー | `size_t` | ベンダーAPI互換性 |
 
-**詳細:** [型システムの統一](type_system_unification.md)を参照してください。
+**詳細:** [型システムの統一](type-system-unification.md)を参照してください。
 
 #### 静的バッファの活用
 
@@ -1041,7 +1041,7 @@ if (current_flow < 2.0f) {
 
 - [抽象化原則ガイド](abstraction-principles.md) - 汎用的な抽象化原則とSOLID原則
 - [アーキテクチャガイド](architecture.md) - 5層アーキテクチャの詳細
-- [C++14互換性ガイド](cpp17_features.md) - 使用可能なC++機能
+- [C++17機能ガイド](cpp17-features.md) - 使用可能なC++機能
 - CLAUDE.md - コーディング規約全般
 
 ---
