@@ -143,6 +143,9 @@ bin/
 # Test executables (root directory)
 /test_*
 
+# Test Framework
+tests/doctest.h
+
 # Example executables (examples directory)
 /examples/*_demo
 /examples/*_example
