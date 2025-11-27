@@ -15,6 +15,12 @@ class PowerContext;
 
 /**
  * @brief システムコンテキスト
+ *
+ * システム全体を管理する最上位のコンテキストクラス。
+ * 各種デバイスコンテキストへのアクセスを提供する。
+ *
+ * @note このクラスはプラットフォーム固有の実装が必要です。
+ *       M5Stack、Arduino などの具体的な実装で継承してください。
  */
 class SystemContext {
 public:
@@ -44,6 +50,14 @@ public:
     // ========================================
     // カテゴリ別コンテキストアクセス
     // ========================================
+    //
+    // 設計意図: これらのメソッドは const メンバ関数ですが、
+    // 非const参照を返します。これは以下の理由によります：
+    // - SystemContext 自体の状態は変更されない
+    // - 取得したコンテキストは通常ミュータブルに使用される
+    // - DI（依存性注入）パターンとして、コンテキストへのアクセスを提供
+    //
+    // const SystemContext からでも、デバイス操作が可能であることを意図しています。
 
     /** @brief 接続可能なデバイスのコンテキスト */
     [[nodiscard]] virtual ConnectableContext& get_connectable_context() const = 0;
@@ -72,6 +86,22 @@ protected:
 
 /**
  * @brief グローバルSystemContextを取得
+ *
+ * @return SystemContext& プラットフォーム固有のSystemContext実装
+ *
+ * @note この関数はプラットフォーム実装で定義する必要があります。
+ *       ライブラリ本体には定義が含まれていません。
+ *
+ * @par 実装例（プラットフォーム側）
+ * @code
+ * // m5stack_platform.cpp
+ * namespace omusubi {
+ *     static M5StackSystemContext context;
+ *     SystemContext& get_system_context() {
+ *         return context;
+ *     }
+ * }
+ * @endcode
  */
 SystemContext& get_system_context();
 

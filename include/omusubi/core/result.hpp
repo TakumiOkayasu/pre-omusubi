@@ -186,7 +186,7 @@ public:
      * @return 成功時の値への参照
      * @warning エラー状態の場合はアサーション失敗
      */
-    constexpr T& value() {
+    [[nodiscard]] constexpr T& value() {
         assert(is_ok_);
         return storage_.value;
     }
@@ -196,7 +196,7 @@ public:
      * @return 成功時の値へのconst参照
      * @warning エラー状態の場合はアサーション失敗
      */
-    constexpr const T& value() const {
+    [[nodiscard]] constexpr const T& value() const {
         assert(is_ok_);
         return storage_.value;
     }
@@ -206,7 +206,7 @@ public:
      * @return エラー情報への参照
      * @warning 成功状態の場合はアサーション失敗
      */
-    constexpr E& error() {
+    [[nodiscard]] constexpr E& error() {
         assert(!is_ok_);
         return storage_.error;
     }
@@ -216,7 +216,7 @@ public:
      * @return エラー情報へのconst参照
      * @warning 成功状態の場合はアサーション失敗
      */
-    constexpr const E& error() const {
+    [[nodiscard]] constexpr const E& error() const {
         assert(!is_ok_);
         return storage_.error;
     }

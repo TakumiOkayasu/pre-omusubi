@@ -9,6 +9,15 @@ namespace omusubi {
 
 /**
  * @brief 出力デバイスのコンテキスト
+ *
+ * @note このクラスは現在プレースホルダーです。
+ *       将来のバージョンで以下の出力コンテキストが追加予定:
+ *       - DisplayContext（ディスプレイ出力）
+ *       - LEDContext（LED制御）
+ *       - SpeakerContext（スピーカー出力）
+ *
+ * @warning 現在このクラスには機能がありません。
+ *          プラットフォーム実装で具体的な出力デバイスアクセスを提供してください。
  */
 class OutputContext {
 public:

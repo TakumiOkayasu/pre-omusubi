@@ -1,5 +1,27 @@
 #pragma once
 
+/**
+ * @file format.hpp
+ * @brief 型安全なフォーマット文字列ライブラリ
+ *
+ * @note std::forward / std::move を使用しない設計について
+ *
+ * このファイルでは、forwarding reference パラメータに対して
+ * std::forward を意図的に使用していません。
+ *
+ * 理由:
+ * 1. プロジェクト方針として std::move() を禁止している（RVO最適化を妨げるため）
+ * 2. std::forward は std::move と同様の効果を持つ場合がある
+ * 3. format() の引数は通常コピーコストが小さい基本型やstring_view
+ * 4. 完全転送よりもコードの単純さを優先
+ *
+ * clang-tidy警告の抑制:
+ * - cppcoreguidelines-missing-std-forward
+ * - cppcoreguidelines-rvalue-reference-param-not-moved
+ *
+ * これらの警告は意図的な設計決定によるものです。
+ */
+
 #include <cstdint>
 #include <omusubi/core/fixed_string.hpp>
 #include <string_view>

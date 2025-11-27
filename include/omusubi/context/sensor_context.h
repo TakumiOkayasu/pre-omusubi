@@ -9,6 +9,15 @@ namespace omusubi {
 
 /**
  * @brief センサーデバイスのコンテキスト
+ *
+ * @note このクラスは現在プレースホルダーです。
+ *       将来のバージョンで以下のセンサーコンテキストが追加予定:
+ *       - AccelerometerContext（加速度センサー）
+ *       - GyroscopeContext（ジャイロセンサー）
+ *       - TemperatureContext（温度センサー）
+ *
+ * @warning 現在このクラスには機能がありません。
+ *          プラットフォーム実装で具体的なセンサーアクセスを提供してください。
  */
 class SensorContext {
 public:

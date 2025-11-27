@@ -17,7 +17,7 @@ public:
     ByteReadable& operator=(ByteReadable&&) = delete;
 
     /** @brief バイト列を読み取る */
-    virtual size_t read(span<uint8_t> buffer) = 0;
+    [[nodiscard]] virtual size_t read(span<uint8_t> buffer) = 0;
 
     /** @brief 利用可能なバイト数を取得 */
     [[nodiscard]] virtual size_t available() const = 0;

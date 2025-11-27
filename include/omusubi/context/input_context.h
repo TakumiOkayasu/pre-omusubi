@@ -8,6 +8,14 @@ namespace omusubi {
 
 /**
  * @brief 入力デバイスのコンテキスト
+ *
+ * @note このクラスは現在プレースホルダーです。
+ *       将来のバージョンで以下の入力コンテキストが追加予定:
+ *       - ButtonContext（ボタン入力）
+ *       - TouchContext（タッチ入力）
+ *
+ * @warning 現在このクラスには機能がありません。
+ *          プラットフォーム実装で具体的な入力デバイスアクセスを提供してください。
  */
 class InputContext {
 public:

@@ -21,11 +21,17 @@ public:
     Scannable(Scannable&&) = delete;
     Scannable& operator=(Scannable&&) = delete;
 
-    /** @brief スキャンを開始 */
-    virtual void start_scan() = 0;
+    /**
+     * @brief スキャンを開始
+     * @return 開始成功時 true、失敗時 false
+     */
+    [[nodiscard]] virtual bool start_scan() = 0;
 
-    /** @brief スキャンを停止 */
-    virtual void stop_scan() = 0;
+    /**
+     * @brief スキャンを停止
+     * @return 停止成功時 true、失敗時 false
+     */
+    [[nodiscard]] virtual bool stop_scan() = 0;
 
     /** @brief 発見されたデバイス数を取得 */
     [[nodiscard]] virtual uint8_t get_found_count() const = 0;
