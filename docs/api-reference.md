@@ -387,6 +387,98 @@ if (result.is_ok()) {
 uint32_t value = read_sensor().value_or(0);
 ```
 
+### Logger
+
+シングルトンパターンによるグローバルログ機能。
+
+```cpp
+#include <omusubi/core/logger.hpp>
+
+// Loggerクラス
+class Logger {
+public:
+    // コンストラクタ
+    constexpr Logger() noexcept;
+    constexpr Logger(LogOutput* output, LogLevel min_level = LogLevel::INFO) noexcept;
+
+    // 出力先設定
+    void set_output(LogOutput* output) noexcept;
+    [[nodiscard]] LogOutput* get_output() const noexcept;
+
+    // ログレベル設定
+    void set_min_level(LogLevel level) noexcept;
+    [[nodiscard]] constexpr LogLevel get_min_level() const noexcept;
+
+    // テンプレートログ出力
+    template <LogLevel Level>
+    void log(std::string_view message) const;
+
+    // フラッシュ
+    void flush() const;
+};
+
+// シングルトン取得
+Logger& get_logger();
+
+// グローバルログ関数
+template <LogLevel Level>
+void log(std::string_view message);
+
+void log_flush();
+```
+
+**ログレベル:**
+
+```cpp
+enum class LogLevel : uint8_t {
+    DEBUG,     // デバッグ情報
+    INFO,      // 一般情報
+    WARNING,   // 警告
+    ERROR,     // エラー
+    CRITICAL   // 致命的エラー
+};
+```
+
+**使用例:**
+
+```cpp
+#include <omusubi/omusubi.h>
+using namespace omusubi;
+using namespace std::literals;
+
+void setup() {
+    // シングルトンLoggerの初期化
+    static SerialLogOutput log_output(serial);
+    get_logger().set_output(&log_output);
+    get_logger().set_min_level(LogLevel::DEBUG);
+}
+
+void loop() {
+    // グローバル関数でログ出力（推奨）
+    log<LogLevel::INFO>("System running"sv);
+    log<LogLevel::DEBUG>("Debug info"sv);
+    log<LogLevel::WARNING>("Low memory"sv);
+    log<LogLevel::ERROR>("Connection failed"sv);
+
+    // シングルトン経由でも可
+    get_logger().log<LogLevel::CRITICAL>("Fatal error"sv);
+
+    // フラッシュ
+    log_flush();
+}
+
+// 別モジュールからでも同じシングルトンを使用
+void other_module() {
+    log<LogLevel::INFO>("Called from other module"sv);
+}
+```
+
+**特徴:**
+- **シングルトン** - `get_logger()`でどこからでも同じインスタンスにアクセス
+- **テンプレートログ** - `log<Level>()`でコンパイル時にレベル決定
+- **DEBUGログ最適化** - リリースビルド（NDEBUG定義時）でDEBUGログは完全削除
+- **遅延初期化** - 出力先を後から設定可能（設定前は何も出力しない）
+
 ## Interfaces
 
 ### ByteReadable
@@ -966,5 +1058,5 @@ constexpr size_t len = msg.size();
 
 ---
 
-**Version:** 2.1.0
-**Last Updated:** 2025-11-25
+**Version:** 2.2.0
+**Last Updated:** 2025-11-27

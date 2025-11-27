@@ -13,7 +13,79 @@
 
 ### 破壊的変更
 
-現時点で予定されている破壊的変更はありません。
+#### 1. Logger APIの変更
+
+**変更内容:**
+- 個別のログメソッド（`debug()`, `info()`, `warning()`, `error()`, `critical()`）を削除
+- テンプレートベースの`log<Level>()`メソッドに統一
+- `log_at<Level>(logger, msg)`関数を削除
+- グローバル関数（`log_debug()`, `log_info()`等）を削除
+- 新しいグローバルテンプレート関数`log<Level>(msg)`を追加
+- シングルトンパターン（`get_logger()`）を追加
+
+**影響を受けるコード:**
+
+```cpp
+// ❌ 旧API（動作しない）
+Logger logger(&output, LogLevel::INFO);
+logger.info("message"sv);
+logger.debug("message"sv);
+logger.warning("message"sv);
+logger.error("message"sv);
+logger.critical("message"sv);
+
+log_at<LogLevel::INFO>(logger, "message"sv);
+
+log_info("message"sv);
+log_debug("message"sv);
+log_warning("message"sv);
+log_error("message"sv);
+log_critical("message"sv);
+
+// ✅ 新API
+Logger logger(&output, LogLevel::INFO);
+logger.log<LogLevel::INFO>("message"sv);
+logger.log<LogLevel::DEBUG>("message"sv);
+logger.log<LogLevel::WARNING>("message"sv);
+logger.log<LogLevel::ERROR>("message"sv);
+logger.log<LogLevel::CRITICAL>("message"sv);
+
+// シングルトン使用（推奨）
+get_logger().set_output(&output);
+get_logger().log<LogLevel::INFO>("message"sv);
+
+// グローバル関数（推奨）
+log<LogLevel::INFO>("message"sv);
+log<LogLevel::DEBUG>("message"sv);
+log<LogLevel::WARNING>("message"sv);
+log<LogLevel::ERROR>("message"sv);
+log<LogLevel::CRITICAL>("message"sv);
+```
+
+**移行手順:**
+
+1. Loggerインスタンスをシングルトン（`get_logger()`）に変更
+2. `logger.info(msg)` → `logger.log<LogLevel::INFO>(msg)`に変更
+3. `log_at<Level>(logger, msg)` → `log<Level>(msg)`に変更
+4. `log_info(msg)` → `log<LogLevel::INFO>(msg)`に変更
+
+**自動移行スクリプト:**
+
+```bash
+# 個別メソッドの置換
+find . -name "*.cpp" | xargs sed -i 's/\.debug(/\.log<LogLevel::DEBUG>(/g'
+find . -name "*.cpp" | xargs sed -i 's/\.info(/\.log<LogLevel::INFO>(/g'
+find . -name "*.cpp" | xargs sed -i 's/\.warning(/\.log<LogLevel::WARNING>(/g'
+find . -name "*.cpp" | xargs sed -i 's/\.error(/\.log<LogLevel::ERROR>(/g'
+find . -name "*.cpp" | xargs sed -i 's/\.critical(/\.log<LogLevel::CRITICAL>(/g'
+
+# グローバル関数の置換
+find . -name "*.cpp" | xargs sed -i 's/log_debug(/log<LogLevel::DEBUG>(/g'
+find . -name "*.cpp" | xargs sed -i 's/log_info(/log<LogLevel::INFO>(/g'
+find . -name "*.cpp" | xargs sed -i 's/log_warning(/log<LogLevel::WARNING>(/g'
+find . -name "*.cpp" | xargs sed -i 's/log_error(/log<LogLevel::ERROR>(/g'
+find . -name "*.cpp" | xargs sed -i 's/log_critical(/log<LogLevel::CRITICAL>(/g'
+```
 
 ### 非推奨機能
 
@@ -273,5 +345,5 @@ namespace omusubi {
 
 ---
 
-**Version:** 1.0.1
-**Last Updated:** 2025-11-16
+**Version:** 1.1.0
+**Last Updated:** 2025-11-27

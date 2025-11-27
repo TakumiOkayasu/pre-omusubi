@@ -28,45 +28,57 @@ public:
     constexpr Logger(LogOutput* output, LogLevel min_level = LogLevel::INFO) noexcept : output_(output), min_level_(min_level) {}
 
     /**
-     * @brief ログを出力
-     * @param level ログレベル
-     * @param message ログメッセージ
+     * @brief デフォルトコンストラクタ（シングルトン用）
+     *
+     * 出力先なし、最小レベルINFOで初期化。
+     * 後からset_output()で出力先を設定可能。
      */
-    void log(LogLevel level, std::string_view message) const {
-        if (level >= min_level_ && output_ != nullptr) {
-            output_->write(level, message);
+    constexpr Logger() noexcept : output_(nullptr), min_level_(LogLevel::INFO) {}
+
+    /**
+     * @brief 出力先を設定
+     * @param output ログ出力先（nullptrで出力無効化）
+     */
+    void set_output(LogOutput* output) noexcept { output_ = output; }
+
+    /**
+     * @brief 現在の出力先を取得
+     * @return 出力先（未設定の場合nullptr）
+     */
+    [[nodiscard]] LogOutput* get_output() const noexcept { return output_; }
+
+    /**
+     * @brief テンプレートベースのログ出力
+     *
+     * コンパイル時にログレベルが決定されるため、
+     * リリースビルドではDEBUGログが完全に削除される。
+     *
+     * @tparam Level ログレベル
+     * @param message ログメッセージ
+     *
+     * @par 使用例
+     * @code
+     * logger.log<LogLevel::INFO>("message"sv);
+     * logger.log<LogLevel::ERROR>("error"sv);
+     * @endcode
+     */
+    template <LogLevel Level>
+    void log(std::string_view message) const {
+#ifdef NDEBUG
+        constexpr bool is_debug_build = false;
+#else
+        constexpr bool is_debug_build = true;
+#endif
+
+        if constexpr (Level == LogLevel::DEBUG && !is_debug_build) {
+            // リリースビルドではDEBUGログは完全に削除される
+            (void)message;
+        } else {
+            if (Level >= min_level_ && output_ != nullptr) {
+                output_->write(Level, message);
+            }
         }
     }
-
-    /**
-     * @brief DEBUGレベルでログ出力
-     * @param message ログメッセージ
-     */
-    void debug(std::string_view message) const { log(LogLevel::DEBUG, message); }
-
-    /**
-     * @brief INFOレベルでログ出力
-     * @param message ログメッセージ
-     */
-    void info(std::string_view message) const { log(LogLevel::INFO, message); }
-
-    /**
-     * @brief WARNINGレベルでログ出力
-     * @param message ログメッセージ
-     */
-    void warning(std::string_view message) const { log(LogLevel::WARNING, message); }
-
-    /**
-     * @brief ERRORレベルでログ出力
-     * @param message ログメッセージ
-     */
-    void error(std::string_view message) const { log(LogLevel::ERROR, message); }
-
-    /**
-     * @brief CRITICALレベルでログ出力
-     * @param message ログメッセージ
-     */
-    void critical(std::string_view message) const { log(LogLevel::CRITICAL, message); }
 
     /**
      * @brief 最小ログレベルを設定
@@ -111,32 +123,66 @@ public:
     return {"UNKNOWN", 7};
 }
 
+// ========================================
+// シングルトンロガー
+// ========================================
+
 /**
- * @brief テンプレートベースのログ出力ヘルパー（C++17 if constexpr版）
+ * @brief グローバルLoggerインスタンスを取得
  *
- * 使用例:
- *   log_at<LogLevel::DEBUG>(logger, "Debug message"_sv);
- *   log_at<LogLevel::ERROR>(logger, "Error occurred"_sv);
+ * Meyerのシングルトンパターンを使用。
+ * どこからでも同じLoggerインスタンスにアクセス可能。
  *
- * リリースビルド（NDEBUG定義時）では、DEBUGレベルのログは
- * コンパイラの最適化により完全に削除されます。
+ * @return Logger& グローバルLoggerへの参照
+ *
+ * @par 使用例
+ * @code
+ * // 初期化時（setup()など）
+ * static SerialLogOutput log_output(&serial);
+ * get_logger().set_output(&log_output);
+ * get_logger().set_min_level(LogLevel::DEBUG);
+ *
+ * // どこからでも使用可能
+ * get_logger().log<LogLevel::INFO>("Hello"sv);
+ * log<LogLevel::INFO>("Hello"sv);  // グローバル関数も使用可能
+ * @endcode
+ *
+ * @note 出力先を設定する前に呼び出しても安全（何も出力されない）
+ */
+inline Logger& get_logger() {
+    static Logger instance;
+    return instance;
+}
+
+/**
+ * @brief グローバルロガーへのテンプレートログ出力
+ *
+ * シングルトンロガーを使用してどこからでもログ出力可能。
+ * テンプレート引数でログレベルを指定するため、
+ * リリースビルドではDEBUGログが完全に削除される。
+ *
+ * @tparam Level ログレベル
+ * @param message ログメッセージ
+ *
+ * @par 使用例
+ * @code
+ * log<LogLevel::DEBUG>("debug message"sv);
+ * log<LogLevel::INFO>("info message"sv);
+ * log<LogLevel::WARNING>("warning"sv);
+ * log<LogLevel::ERROR>("error"sv);
+ * log<LogLevel::CRITICAL>("critical"sv);
+ * @endcode
  */
 template <LogLevel Level>
-void log_at(const Logger& logger, std::string_view message) {
-#ifdef NDEBUG
-    constexpr bool is_debug_build = false;
-#else
-    constexpr bool is_debug_build = true;
-#endif
+void log(std::string_view message) {
+    get_logger().log<Level>(message);
+}
 
-    // if constexprによりコンパイル時に分岐が決定される
-    if constexpr (Level == LogLevel::DEBUG && !is_debug_build) {
-        // リリースビルドではDEBUGログは完全に削除される
-        (void)logger;
-        (void)message;
-    } else {
-        logger.log(Level, message);
-    }
+/**
+ * @brief グローバルロガーをフラッシュ
+ */
+inline void log_flush() {
+    get_logger().flush();
 }
 
 } // namespace omusubi
