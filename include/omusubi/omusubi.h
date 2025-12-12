@@ -10,6 +10,7 @@
 #include "core/fixed_buffer.hpp"
 #include "core/fixed_string.hpp"
 #include "core/format.hpp"
+#include "core/function.hpp"
 #include "core/log_level.h"
 #include "core/logger.hpp"
 #include "core/result.hpp"
