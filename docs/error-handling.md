@@ -1,13 +1,14 @@
 # エラーハンドリングガイド
 
 ---
-**Version:** 1.2.0
-**Last Updated:** 2025-11-25
+**Version:** 1.3.0
+**Last Updated:** 2025-12-12
 ---
 
 このドキュメントでは、Omusubiフレームワークにおけるエラーハンドリングの方針と実装パターンを定義します。
 
 **変更履歴:**
+- 1.3.0 (2025-12-12): Result<T, E>のconstexpr対応を追記
 - 1.2.0 (2025-11-25): Optional<T>エイリアスを削除し、std::optionalを直接使用
 - 1.1.0 (2025-11-25): Optional<T>をC++17標準std::optionalへ移行
 - 1.0.0: 初版作成
@@ -301,7 +302,10 @@ std::optional<SensorData> get_cached_data(uint32_t id) {
 
 ### Pattern 5: Result<T, E> による値とエラーの分離
 
-**値とエラー情報を両方返す場合。**
+**値とエラー情報を両方返す場合。constexpr 対応。**
+
+> **Note:** `T` と `E` がトリビアルに破壊可能な型の場合、`Result<T, E>` は constexpr で使用できます。
+> これにより、コンパイル時の値検証やルックアップテーブルの生成が可能です。
 
 ```cpp
 // Result<T, E> パターン（Rust風）
@@ -386,6 +390,14 @@ if (result.is_ok()) {
 } else {
     handle_error(result.error());
 }
+
+// constexpr での使用（コンパイル時評価）
+constexpr auto ok_result = Result<int, Error>::ok(42);
+static_assert(ok_result.is_ok());
+static_assert(ok_result.value() == 42);
+
+constexpr auto err_result = Result<int, Error>::err(Error::INVALID_PARAMETER);
+static_assert(err_result.is_err());
 ```
 
 **適用場面:**
@@ -837,5 +849,5 @@ bool connect() {
 
 ---
 
-**Version:** 1.2.0
-**Last Updated:** 2025-11-17
+**Version:** 1.3.0
+**Last Updated:** 2025-12-12

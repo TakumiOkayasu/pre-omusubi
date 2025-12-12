@@ -107,6 +107,107 @@ void process(span<const uint8_t> data) {
 process(s);
 ```
 
+### StaticVector<T, N>
+
+固定容量の可変長配列。`std::vector` のヒープレス代替。
+
+```cpp
+// 最大10要素の配列
+StaticVector<int, 10> vec;
+vec.push_back(1);
+vec.push_back(2);
+vec.emplace_back(3);
+
+// 初期化子リストで構築
+StaticVector<int, 5> vec2 = {1, 2, 3};
+
+// イテレーション
+for (int v : vec) {
+    // ...
+}
+
+// アクセス
+vec[0];           // 添字アクセス
+vec.front();      // 先頭要素
+vec.back();       // 末尾要素
+vec.size();       // 現在の要素数
+vec.capacity();   // 最大容量
+vec.empty();      // 空かどうか
+vec.full();       // 満杯かどうか
+
+// 削除
+vec.pop_back();              // 末尾を削除
+vec.erase(vec.begin());      // 順序を維持して削除
+vec.erase_unordered(0);      // 順序を維持しない高速削除
+vec.clear();                 // 全削除
+```
+
+### RingBuffer<T, N>
+
+固定長のリングバッファ（FIFO）。古いデータを自動的に上書き。
+
+```cpp
+// 最大5要素のリングバッファ
+RingBuffer<int, 5> ring;
+
+// 要素追加（満杯時は古いデータを上書き）
+ring.push(1);
+ring.push(2);
+
+// 要素追加（満杯時は失敗）
+if (!ring.try_push(3)) {
+    // バッファ満杯
+}
+
+// 取り出し（FIFO順）
+if (auto val = ring.pop()) {
+    int v = *val;
+}
+
+// 先頭・末尾参照
+ring.front();  // 最も古い要素
+ring.back();   // 最も新しい要素
+
+// 状態確認
+ring.size();      // 現在の要素数
+ring.empty();     // 空かどうか
+ring.full();      // 満杯かどうか
+ring.clear();     // 全削除
+
+// イテレーション（FIFO順）
+for (int v : ring) {
+    // ...
+}
+```
+
+### Function<Sig, Size>
+
+ヒープレスの型消去コールバックラッパー。
+
+```cpp
+// 基本的な使い方
+Function<void()> callback = []() { /* ... */ };
+callback();
+
+// 引数と戻り値
+Function<int(int, int)> add = [](int a, int b) { return a + b; };
+int result = add(1, 2);  // 3
+
+// キャプチャ付きラムダ
+int multiplier = 10;
+Function<int(int)> mul = [multiplier](int x) { return x * multiplier; };
+
+// 状態確認
+if (callback) {          // 有効かどうか
+    callback();
+}
+
+// ストレージサイズ指定（デフォルト32バイト）
+Function<void(), 64> large_fn;  // 64バイトまでのキャプチャに対応
+```
+
+**注意:** キャプチャのサイズが `Size` を超えるとコンパイルエラーになります。
+
 ### Vector3
 
 3次元ベクトル（センサーデータ用）。`float x, y, z` メンバーを持つ。
@@ -154,6 +255,7 @@ auto log = format("[{}] {}", "INFO", "started");   // "[INFO] started"
 ### Result<T, E>
 
 Rust風のエラーハンドリング型。例外を使わずにエラーを返す。
+**constexpr対応:** T と E がトリビアルに破壊可能な場合、コンパイル時評価が可能。
 
 ```cpp
 Result<uint32_t, Error> read_sensor() {
@@ -168,6 +270,11 @@ if (result.is_ok()) {
 
 // デフォルト値付き
 uint32_t value = read_sensor().value_or(0);
+
+// constexpr での使用
+constexpr auto ok_result = Result<int, Error>::ok(42);
+static_assert(ok_result.is_ok());
+static_assert(ok_result.value() == 42);
 ```
 
 ### Logger
@@ -192,6 +299,79 @@ log<LogLevel::DEBUG>(msg.view());
 ```
 
 **ポイント:** リリースビルド（`NDEBUG`）ではDEBUGログは完全削除される。
+
+### parse関数
+
+文字列から数値への変換関数。オーバーフロー検出付き。
+
+```cpp
+// 符号なし整数パース
+auto result = parse_uint<uint32_t>("12345"sv);
+if (result.is_ok()) {
+    uint32_t value = result.value();
+}
+
+// 符号付き整数パース
+auto result = parse_int<int32_t>("-42"sv);
+if (result.is_ok()) {
+    int32_t value = result.value();
+}
+
+// 浮動小数点パース
+auto result = parse_float<float>("3.14"sv);
+if (result.is_ok()) {
+    float value = result.value();
+}
+
+// 便利なエイリアス
+parse_u8("255"sv);     // Result<uint8_t, Error>
+parse_u16("65535"sv);  // Result<uint16_t, Error>
+parse_u32("123"sv);    // Result<uint32_t, Error>
+parse_i8("-128"sv);    // Result<int8_t, Error>
+parse_i16("-1000"sv);  // Result<int16_t, Error>
+parse_i32("-12345"sv); // Result<int32_t, Error>
+parse_f32("1.5"sv);    // Result<float, Error>
+parse_f64("3.14159"sv);// Result<double, Error>
+```
+
+**対応フォーマット:**
+- 整数: `"123"`, `"-456"`, `"+789"`
+- 浮動小数点: `"3.14"`, `"-1.5"`, `".5"`, `"2."`
+
+### 数学ユーティリティ
+
+組み込み向けの数学関数群。すべて constexpr 対応。
+
+```cpp
+// 値を範囲内に制限
+int clamped = clamp(15, 0, 10);  // 10
+
+// 値を別のレンジにマッピング（Arduino map()相当）
+int pwm = map_range(512, 0, 1023, 0, 255);  // 127
+
+// マッピング + クランプ
+int safe = map_range_clamped(1500, 0, 1023, 0, 255);  // 255
+
+// 線形補間
+float mid = lerp(0.0f, 10.0f, 0.5f);  // 5.0
+
+// 逆線形補間（位置を求める）
+float t = inverse_lerp(0.0f, 10.0f, 5.0f);  // 0.5
+
+// 絶対値
+int a = omusubi::abs(-5);  // 5
+
+// 符号
+int s = sign(-3);  // -1
+
+// 最小値・最大値
+int m = min(3, 5);  // 3
+int M = max(3, 5);  // 5
+
+// コンパイル時評価
+constexpr int c = clamp(15, 0, 10);
+static_assert(c == 10);
+```
 
 ## Interfaces
 
@@ -270,5 +450,5 @@ void process(std::string_view str) { }
 
 ---
 
-**Version:** 3.0.0
-**Last Updated:** 2025-11-27
+**Version:** 3.1.0
+**Last Updated:** 2025-12-12

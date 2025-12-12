@@ -122,9 +122,30 @@ auto str = format("[{}] {}\r\n", level, msg);
 
 ## Core Types
 
+**文字列・バッファ:**
 - `std::string_view`, `FixedString<N>`, `FixedBuffer<N>`
-- `span<T>`, `Vector3`, `Result<T, E>`, `std::optional<T>`
-- `format()` - Type-safe string formatting
+
+**コンテナ:**
+- `span<T>` - 非所有メモリビュー
+- `StaticVector<T, N>` - 固定容量の可変長配列
+- `RingBuffer<T, N>` - 固定長リングバッファ（FIFO）
+
+**関数・コールバック:**
+- `Function<Sig, Size>` - ヒープレス型消去コールバック
+
+**エラーハンドリング:**
+- `Result<T, E>` - Rust風エラー型（constexpr対応）
+- `std::optional<T>` - 値の有無表現
+
+**数値・数学:**
+- `Vector3` - 3次元ベクトル
+- `clamp()`, `map_range()`, `lerp()` - 数学ユーティリティ
+
+**パース:**
+- `parse_int<T>()`, `parse_uint<T>()`, `parse_float<T>()` - 文字列→数値変換
+
+**フォーマット:**
+- `format()` - 型安全な文字列フォーマット
 
 ## Usage Pattern
 

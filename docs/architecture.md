@@ -37,10 +37,13 @@ Omusubiは組み込みシステム特有の制約に対応するため、Context
 - テンプレートによるコード生成で型安全性を保証
 - `span<T>`による非所有参照で不要なコピーを回避
 
-**固定サイズバッファの使用:**
-- `FixedString<N>`, `FixedBuffer<N>`で容量を明示
-- スタック上に確保されることを保証
-- サイズ超過は実行時エラーではなく、コンパイル時チェック可能
+**固定サイズコンテナの使用:**
+- `FixedString<N>`, `FixedBuffer<N>` で文字列・バイト列の容量を明示
+- `StaticVector<T, N>` で動的配列の最大要素数を明示
+- `RingBuffer<T, N>` で FIFO バッファの容量を明示
+- `Function<Sig, Size>` でコールバックのキャプチャサイズを明示
+- すべてスタック上に確保されることを保証
+- サイズ超過はコンパイル時または実行時に検出
 
 ### インターフェース分離原則（ISP）の適用
 
@@ -611,7 +614,9 @@ std::vector<int> data;
 
 // ✅ 許可
 MyObject obj;                    // スタック
-FixedString<256> str;           // 固定サイズ
+FixedString<256> str;           // 固定サイズ文字列
+StaticVector<int, 10> vec;      // 固定容量配列（std::vectorの代替）
+RingBuffer<int, 5> ring;        // 固定長リングバッファ
 static MyObject global_obj;     // 静的領域
 ```
 
@@ -721,5 +726,5 @@ SerialContext* serial = ctx.get_serial_context<0>();
 
 ---
 
-**Version:** 2.2.0
-**Last Updated:** 2025-11-27
+**Version:** 2.3.0
+**Last Updated:** 2025-12-12
