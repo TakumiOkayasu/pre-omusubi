@@ -10,6 +10,7 @@
 #include "core/bit_set.hpp"
 #include "core/fixed_buffer.hpp"
 #include "core/fixed_string.hpp"
+#include "core/flags.hpp"
 #include "core/format.hpp"
 #include "core/function.hpp"
 #include "core/log_level.h"
