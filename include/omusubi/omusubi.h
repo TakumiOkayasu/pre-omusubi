@@ -13,6 +13,7 @@
 #include "core/function.hpp"
 #include "core/log_level.h"
 #include "core/logger.hpp"
+#include "core/parse.hpp"
 #include "core/result.hpp"
 #include "core/ring_buffer.hpp"
 #include "core/span.hpp"
