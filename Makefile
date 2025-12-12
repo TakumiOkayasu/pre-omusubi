@@ -53,7 +53,7 @@ CORE_TESTS = test_result test_logger
 CORE_TEST_BINS = $(patsubst %,$(BIN_DIR)/%,$(CORE_TESTS))
 
 # Tests in tests/ directory
-BASIC_TESTS = test_auto_capacity test_format test_format_string test_fixed_string test_fixed_buffer test_span test_string_view test_vector3 test_static_vector test_ring_buffer test_function test_parse test_math
+BASIC_TESTS = test_auto_capacity test_format test_format_string test_fixed_string test_fixed_buffer test_span test_string_view test_vector3 test_static_vector test_ring_buffer test_function test_parse test_math test_bit_set
 BASIC_TEST_BINS = $(patsubst %,$(BIN_DIR)/%,$(BASIC_TESTS))
 
 # All test binaries

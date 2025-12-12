@@ -7,6 +7,7 @@
 #include "context/scannable_context.h"
 #include "context/sensor_context.h"
 #include "context/system_info_context.h"
+#include "core/bit_set.hpp"
 #include "core/fixed_buffer.hpp"
 #include "core/fixed_string.hpp"
 #include "core/format.hpp"
