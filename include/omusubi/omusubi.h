@@ -15,6 +15,7 @@
 #include "core/result.hpp"
 #include "core/span.hpp"
 #include "core/static_string.hpp"
+#include "core/static_vector.hpp"
 #include "core/string_base.hpp"
 #include "core/string_view.h"
 #include "core/types.h"
