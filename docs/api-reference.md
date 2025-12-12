@@ -208,6 +208,103 @@ Function<void(), 64> large_fn;  // 64バイトまでのキャプチャに対応
 
 **注意:** キャプチャのサイズが `Size` を超えるとコンパイルエラーになります。
 
+### BitSet<N>
+
+固定長ビット配列。I/Oポート操作、フラグ管理、ビットマスク処理に使用。
+
+```cpp
+// 8ビットのビットセット
+BitSet<8> bits;
+bits.set(0).set(3).set(7);   // ビット0, 3, 7をセット
+
+// 初期値付き構築
+BitSet<8> flags(0b10101010);
+
+// ビット操作
+bits.set(pos);               // ビットをセット
+bits.reset(pos);             // ビットをクリア
+bits.flip(pos);              // ビットを反転
+bits.test(pos);              // ビットを確認
+bits[pos];                   // 添字アクセス（読み取り専用）
+
+// 全体操作
+bits.set();                  // すべて1
+bits.reset();                // すべて0
+bits.flip();                 // すべて反転
+
+// クエリ
+bits.all();                  // すべて1か
+bits.any();                  // 1つでも1があるか
+bits.none();                 // すべて0か
+bits.count();                // 1の数
+bits.size();                 // ビット数
+
+// 変換
+bits.to_uint32();            // 下位32ビット
+bits.to_uint64();            // 下位64ビット
+
+// ビット演算
+auto c = a & b;              // AND
+auto c = a | b;              // OR
+auto c = a ^ b;              // XOR
+auto c = ~a;                 // NOT
+auto c = a << 2;             // 左シフト
+auto c = a >> 2;             // 右シフト
+
+// constexpr 対応
+constexpr BitSet<8> flags(0b1111);
+static_assert(flags.count() == 4);
+```
+
+### Flags<Enum>
+
+型安全なビットフラグ。列挙型ベースのフラグ操作に使用。
+
+```cpp
+// 列挙型の定義（値はビット位置を表す）
+enum class Permission : uint8_t {
+    READ = 0,    // ビット0
+    WRITE = 1,   // ビット1
+    EXECUTE = 2  // ビット2
+};
+
+// フラグの作成
+Flags<Permission> perms;
+perms.set(Permission::READ).set(Permission::WRITE);
+
+// | 演算子で組み合わせ
+auto perms = Permission::READ | Permission::WRITE;
+
+// make_flags ヘルパー
+auto perms = make_flags(Permission::READ, Permission::WRITE, Permission::EXECUTE);
+
+// フラグ操作
+perms.set(Permission::EXECUTE);      // セット
+perms.reset(Permission::WRITE);      // クリア
+perms.toggle(Permission::READ);      // 反転
+
+// 確認
+perms.test(Permission::READ);        // 単一フラグ確認
+perms.has(Permission::READ);         // test の別名
+perms.has_all(flags);                // すべてのフラグがあるか
+perms.has_any(flags);                // いずれかのフラグがあるか
+
+// クエリ
+perms.any();                         // 1つでもセットされているか
+perms.none();                        // すべてクリアか
+perms.count();                       // セットされたフラグの数
+perms.value();                       // 生の値
+
+// ビット演算
+auto c = a | b;                      // OR
+auto c = a & b;                      // AND
+auto c = a ^ b;                      // XOR
+
+// constexpr 対応
+constexpr auto perms = Permission::READ | Permission::WRITE;
+static_assert(perms.has(Permission::READ));
+```
+
 ### Vector3
 
 3次元ベクトル（センサーデータ用）。`float x, y, z` メンバーを持つ。
@@ -450,5 +547,5 @@ void process(std::string_view str) { }
 
 ---
 
-**Version:** 3.1.0
+**Version:** 3.3.0
 **Last Updated:** 2025-12-12
