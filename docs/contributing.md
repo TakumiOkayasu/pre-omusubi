@@ -701,6 +701,7 @@ docs/
 ├── error-handling.md        # エラーハンドリング
 ├── performance.md           # パフォーマンス最適化
 ├── platform-support.md      # プラットフォームサポート
+├── hardware-abstraction.md  # ハードウェア抽象化ガイドライン（PaHub等）
 └── migration-guide.md       # マイグレーションガイド
 
 README.md                    # プロジェクト概要
@@ -719,5 +720,5 @@ CHANGELOG.md                 # 変更履歴
 
 ---
 
-**Version:** 2.0.1
-**Last Updated:** 2025-11-27
+**Version:** 2.1.0
+**Last Updated:** 2025-12-13

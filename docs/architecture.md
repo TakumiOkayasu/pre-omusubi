@@ -256,6 +256,8 @@ BLEServiceContext                // 間違い
 **責務:** プラットフォーム固有の実装
 
 > **注意:** 現時点では Platform Layer は未実装です。以下はアーキテクチャ設計のガイドラインです。
+>
+> **関連ドキュメント:** I2Cマルチプレクサー（PaHub等）やGPIO Expanderなどのハードウェア拡張の実装パターンについては、[ハードウェア抽象化ガイドライン](hardware-abstraction.md)を参照してください。
 
 **実装パターン:**
 
@@ -726,5 +728,5 @@ SerialContext* serial = ctx.get_serial_context<0>();
 
 ---
 
-**Version:** 2.3.0
-**Last Updated:** 2025-12-12
+**Version:** 2.4.0
+**Last Updated:** 2025-12-13
