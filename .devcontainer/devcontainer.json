@@ -49,8 +49,7 @@
 		}
 	},
 	"features": {
-		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-		"ghcr.io/anthropics/devcontainer-features/claude-code:1.0.5": {}
+		"ghcr.io/anthropics/devcontainer-features/claude-code:latest": {}
 	},
 	"postCreateCommand": "cp -f /usr/local/include/doctest/doctest.h /workspace/tests/doctest.h"
 }
