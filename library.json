@@ -1,0 +1,16 @@
+{
+    "name": "pre-omusubi",
+    "version": "0.0.1",
+    "description": "Interface definitions for omusubi embedded framework",
+    "keywords": ["embedded", "interface", "m5stack", "esp32"],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/TakumiOkayasu/pre-omusubi.git"
+    },
+    "frameworks": ["arduino", "espidf"],
+    "platforms": ["espressif32"],
+    "build": {
+        "flags": ["-std=gnu++17"],
+        "includeDir": "include"
+    }
+}
