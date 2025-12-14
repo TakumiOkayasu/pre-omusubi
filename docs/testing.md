@@ -53,8 +53,8 @@ TEST_CASE("FixedString - starts_with機能") {
 ### 3. テスト範囲
 
 **単体テスト対象:**
-- Core types (`span<T>`, `std::string_view`, `FixedString<N>`, `FixedBuffer<N>`, `Vector3`)
-- Utility functions
+- Core types (`span<T>`, `std::string_view`, `FixedString<N>`, `FixedBuffer<N>`, `StaticVector<T, N>`, `RingBuffer<T, N>`, `Function<Sig, Size>`, `BitSet<N>`, `Flags<Enum>`, `Result<T, E>`, `Vector3`)
+- Utility functions (`format()`, `clamp()`, `map_range()`, `lerp()`, `parse_int()`, etc.)
 - Interface contracts
 
 **統合テスト対象:**
@@ -904,5 +904,5 @@ jobs:
 
 ---
 
-**Version:** 3.0.1
-**Last Updated:** 2025-11-25
+**Version:** 3.0.2
+**Last Updated:** 2025-12-14

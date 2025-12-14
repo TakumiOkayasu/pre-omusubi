@@ -89,7 +89,7 @@ buffer.append(0x01);
 buffer.append(0x02);
 
 const uint8_t* data = buffer.data();
-uint32_t len = buffer.length();
+uint32_t len = buffer.size();
 ```
 
 ### span<T>
@@ -137,7 +137,7 @@ vec.full();       // 満杯かどうか
 
 // 削除
 vec.pop_back();              // 末尾を削除
-vec.erase(vec.begin());      // 順序を維持して削除
+vec.erase(0);                // 順序を維持して削除（インデックス指定）
 vec.erase_unordered(0);      // 順序を維持しない高速削除
 vec.clear();                 // 全削除
 ```
@@ -160,9 +160,11 @@ if (!ring.try_push(3)) {
 }
 
 // 取り出し（FIFO順）
-if (auto val = ring.pop()) {
-    int v = *val;
+int v;
+if (ring.pop(v)) {
+    // v に値が格納される
 }
+ring.pop();  // 値を破棄して削除のみ
 
 // 先頭・末尾参照
 ring.front();  // 最も古い要素
@@ -547,5 +549,5 @@ void process(std::string_view str) { }
 
 ---
 
-**Version:** 3.3.0
-**Last Updated:** 2025-12-12
+**Version:** 3.3.1
+**Last Updated:** 2025-12-14

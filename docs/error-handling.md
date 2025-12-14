@@ -458,7 +458,7 @@ if (result.is_err()) {
 
 // パース処理（構文エラーの詳細が必要）
 Result<uint32_t, Error> parse_number(std::string_view text) {
-    if (text.is_empty()) {
+    if (text.empty()) {
         return Result<uint32_t, Error>::err(Error::INVALID_PARAMETER);
     }
     if (!is_valid_format(text)) {
@@ -849,5 +849,5 @@ bool connect() {
 
 ---
 
-**Version:** 1.3.0
-**Last Updated:** 2025-12-12
+**Version:** 1.3.1
+**Last Updated:** 2025-12-14

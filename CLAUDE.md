@@ -175,3 +175,13 @@ When creating docs in `docs/`:
 1. Add version header: `**Version:** 1.0.0` / `**Last Updated:** YYYY-MM-DD`
 2. Update related docs and increment patch versions
 3. Maintain consistent terminology
+
+**CRITICAL: Documentation Sync Policy**
+
+ソースコード（`include/`, `src/`）を変更した場合、**必ず**全てのドキュメントとの整合性をチェックし、乖離があれば修正すること:
+
+**チェック項目:**
+- メソッド名・シグネチャが実装と一致しているか
+- サンプルコードが実際にコンパイル可能か
+- 型名・クラス名が正確か
+- 新しい型/関数がドキュメントに記載されているか
