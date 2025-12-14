@@ -339,17 +339,54 @@ enum class ButtonState : uint8_t {
 };
 ```
 
-### format()
+### format() / fmt()
 
 型安全な文字列フォーマット関数。`{}` でプレースホルダーを指定。
 
 ```cpp
+// 容量自動計算版
 auto msg = format("Hello, {}!", "World");          // "Hello, World!"
-auto hex = format("Value: 0x{:X}", 255);           // "Value: 0xFF"
 auto log = format("[{}] {}", "INFO", "started");   // "[INFO] started"
+
+// 容量指定版
+auto str = format<128>("Value: {}", 42);           // FixedString<128>
+
+// デフォルト容量256版（短縮形）
+auto str2 = fmt("Hello, {}!", "World");            // FixedString<256>
+
+// 出力先指定版
+FixedString<64> result;
+format_to(result, "x={}, y={}", 10, 20);
 ```
 
-**フォーマット指定子:** `{}`, `{:d}`, `{:x}`, `{:X}`, `{:b}`, `{:f}`, `{:s}`
+**フォーマット指定子:**
+```cpp
+auto dec = format<64>("Dec: {:d}", 255);           // "Dec: 255"
+auto hex = format<64>("Hex: {:x}", 255);           // "Hex: ff"
+auto HEX = format<64>("HEX: {:X}", 255);           // "HEX: FF"
+auto bin = format<64>("Bin: {:b}", 10);            // "Bin: 1010"
+auto flt = format<64>("Float: {:f}", 3.14);        // "Float: 3.14"
+auto str = format<64>("String: {:s}", "Hello");    // "String: Hello"
+```
+
+| 指定子 | 説明 | 対応する型 |
+|--------|------|-----------|
+| `{}` | デフォルト | すべて |
+| `{:d}` | 10進数 | 整数型 |
+| `{:x}` | 16進数（小文字） | 整数型 |
+| `{:X}` | 16進数（大文字） | 整数型 |
+| `{:b}` | 2進数 | 整数型 |
+| `{:f}` | 浮動小数点 | float, double |
+| `{:s}` | 文字列 | 文字列型 |
+
+**16進数フォーマット（0xプレフィックス付き）:**
+```cpp
+auto hex = format_hex<32>(255);                    // "0xff"
+auto hex_upper = format_hex<32>(255, true);        // "0xFF"
+auto hex2 = fmt_hex(0xABCD);                       // "0xabcd" (容量256)
+```
+
+**対応する型:** 整数型（int8〜int64, uint8〜uint64）、float、double、bool、char、const char*、std::string_view
 
 ### Result<T, E>
 
@@ -549,5 +586,5 @@ void process(std::string_view str) { }
 
 ---
 
-**Version:** 3.3.1
+**Version:** 3.5.0
 **Last Updated:** 2025-12-14

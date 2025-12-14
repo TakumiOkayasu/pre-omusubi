@@ -190,3 +190,106 @@ TEST_CASE("Format - fmt_hex()ラッパー") {
         CHECK_EQ(strcmp(result.c_str(), "0xDEADBEEF"), 0);
     }
 }
+
+TEST_CASE("Format - フォーマット指定子 {:d}") {
+    SUBCASE("10進数指定子") {
+        auto result = format<128>("Value: {:d}", 42);
+        CHECK_EQ(strcmp(result.c_str(), "Value: 42"), 0);
+    }
+
+    SUBCASE("負数") {
+        auto result = format<128>("Negative: {:d}", -123);
+        CHECK_EQ(strcmp(result.c_str(), "Negative: -123"), 0);
+    }
+}
+
+TEST_CASE("Format - フォーマット指定子 {:x} {:X}") {
+    SUBCASE("16進数（小文字）") {
+        auto result = format<128>("Hex: {:x}", 255);
+        CHECK_EQ(strcmp(result.c_str(), "Hex: ff"), 0);
+    }
+
+    SUBCASE("16進数（大文字）") {
+        auto result = format<128>("HEX: {:X}", 255);
+        CHECK_EQ(strcmp(result.c_str(), "HEX: FF"), 0);
+    }
+
+    SUBCASE("大きな値（小文字）") {
+        auto result = format<128>("Value: {:x}", 0xDEADBEEFU);
+        CHECK_EQ(strcmp(result.c_str(), "Value: deadbeef"), 0);
+    }
+
+    SUBCASE("大きな値（大文字）") {
+        auto result = format<128>("Value: {:X}", 0xDEADBEEFU);
+        CHECK_EQ(strcmp(result.c_str(), "Value: DEADBEEF"), 0);
+    }
+
+    SUBCASE("ゼロ") {
+        auto result = format<128>("Zero: {:x}", 0);
+        CHECK_EQ(strcmp(result.c_str(), "Zero: 0"), 0);
+    }
+}
+
+TEST_CASE("Format - フォーマット指定子 {:b}") {
+    SUBCASE("2進数") {
+        auto result = format<128>("Binary: {:b}", 10);
+        CHECK_EQ(strcmp(result.c_str(), "Binary: 1010"), 0);
+    }
+
+    SUBCASE("ゼロ") {
+        auto result = format<128>("Zero: {:b}", 0);
+        CHECK_EQ(strcmp(result.c_str(), "Zero: 0"), 0);
+    }
+
+    SUBCASE("255") {
+        auto result = format<128>("255: {:b}", 255);
+        CHECK_EQ(strcmp(result.c_str(), "255: 11111111"), 0);
+    }
+
+    SUBCASE("大きな値") {
+        auto result = format<128>("Value: {:b}", 0xFFU);
+        CHECK_EQ(strcmp(result.c_str(), "Value: 11111111"), 0);
+    }
+}
+
+TEST_CASE("Format - フォーマット指定子 {:f}") {
+    SUBCASE("浮動小数点数") {
+        auto result = format<128>("Float: {:f}", 3.14159f);
+        // 小数点以下は近似値なので、先頭部分のみ確認
+        CHECK(std::strncmp(result.c_str(), "Float: 3.14", 10) == 0);
+    }
+
+    SUBCASE("整数部分のみ") {
+        auto result = format<128>("Value: {:f}", 42.0f);
+        CHECK(std::strncmp(result.c_str(), "Value: 42.0", 10) == 0);
+    }
+
+    SUBCASE("負数") {
+        auto result = format<128>("Negative: {:f}", -1.5f);
+        CHECK(std::strncmp(result.c_str(), "Negative: -1.5", 14) == 0);
+    }
+}
+
+TEST_CASE("Format - フォーマット指定子 {:s}") {
+    SUBCASE("文字列指定子") {
+        auto result = format<128>("String: {:s}", "Hello");
+        CHECK_EQ(strcmp(result.c_str(), "String: Hello"), 0);
+    }
+
+    SUBCASE("std::string_view") {
+        auto result = format<128>("View: {:s}", std::string_view("World"));
+        CHECK_EQ(strcmp(result.c_str(), "View: World"), 0);
+    }
+}
+
+TEST_CASE("Format - 混合フォーマット指定子") {
+    SUBCASE("複数の異なる指定子") {
+        auto result = format<128>("dec:{:d} hex:{:x} bin:{:b}", 10, 255, 5);
+        CHECK_EQ(strcmp(result.c_str(), "dec:10 hex:ff bin:101"), 0);
+    }
+
+    SUBCASE("デフォルトと指定子の混在") {
+        auto result = format<128>("{} and {:x}", 42, 255);
+        CHECK_EQ(strcmp(result.c_str(), "42 and ff"), 0);
+    }
+}
