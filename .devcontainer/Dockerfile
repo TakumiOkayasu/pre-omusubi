@@ -41,7 +41,7 @@ RUN mkdir -p /tmp/doctest \
     | grep "browser_download_url.*doctest.h" \
     | cut -d '"' -f 4 \
     | xargs curl -L -o /tmp/doctest/doctest.h \
-    || curl -L https://raw.githubusercontent.com/doctest/doctest/master/doctest/doctest.h -o /tmp/doctest/doctest.h
+    | curl -L https://raw.githubusercontent.com/doctest/doctest/master/doctest/doctest.h -o /tmp/doctest/doctest.h
 
 # 開発環境セットアップ
 COPY scripts/omusubi-dev.sh /tmp/omusubi-dev.sh
